@@ -38,7 +38,9 @@ app.post('/set-leaderboard', async function (req, res) {
 	return
     }
 
-     // for now all type of leaderboard reward players with the same amount of
+    const gasPrice = await blockchain.web3.eth.getGasPrice();
+    
+    // for now all type of leaderboard reward players with the same amount of
     // CWS tokens.
     // in the next versions, approving CWS tokens should be in the leaderboard blocks
     var totalPrize = blockchain.web3.utils.toWei(calculateTotalPrize().toString());
@@ -53,8 +55,6 @@ app.post('/set-leaderboard', async function (req, res) {
 	.send({from: nftRushOwner.address, gasPrice: gasPrice, gas: approveGasEstimate * 3});
 
     console.log(approveResult);
-
-    const gasPrice = await blockchain.web3.eth.getGasPrice();
 
     if (req.body.type == "daily-spent") {
 	
