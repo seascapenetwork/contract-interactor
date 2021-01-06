@@ -29,8 +29,9 @@ app.post('/set-leaderboard', async function (req, res) {
 
     const gasPrice = await blockchain.web3.eth.getGasPrice();
 
-    if (res.body.type == "daily-spent") {
 	var gasEstimate = await nftRush.methods.addDailySpentWinners(req.body.session_id,
+    if (req.body.type == "daily-spent") {
+	
 								       
 								   req.body.wallets,
 								   req.body.amount)
@@ -41,8 +42,8 @@ app.post('/set-leaderboard', async function (req, res) {
 	    .send({from: nftRushOwner.address, gasPrice: gasPrice, gas: gasEstimate * 3});	
 
 	console.log(result);	
-    } else if (res.body.type == "daily-minted") {
 	const gasEstimate = await nftRush.methods.addDailyMintedWinners(req.body.session_id,
+    } else if (req.body.type == "daily-minted") {
 								   req.body.wallets,
 								   req.body.amount)
 	      .estimateGas({ from: nftRushOwner.address });	
