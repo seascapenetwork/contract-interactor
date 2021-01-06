@@ -39,49 +39,69 @@ app.post('/set-leaderboard', async function (req, res) {
     }
 
     const gasPrice = await blockchain.web3.eth.getGasPrice();
+
+    let approvement = await approveCrowns();
+    if (approvement == false) {
+	res.send('{"status": "error", "message":"no cws were approved to nft rush"}');
+	return;
+    }
     
-    // for now all type of leaderboard reward players with the same amount of
-    // CWS tokens.
-    // in the next versions, approving CWS tokens should be in the leaderboard blocks
-    var totalPrize = blockchain.web3.utils.toWei(calculateTotalPrize().toString());
+    if (req.body.type == "daily-spent") {	
+	var gasEstimate = null;
 
-    const approveGasEstimate = await crowns.methods
-	  .approve(nftRushAddress, totalPrize)    
-	  .estimateGas({ from: nftRushOwner.address });    
-
-
-    var approveResult = await crowns.methods
-	.approve(nftRushAddress, totalPrize)
-	.send({from: nftRushOwner.address, gasPrice: gasPrice, gas: approveGasEstimate * 3});
-
-    console.log(approveResult);
-
-    if (req.body.type == "daily-spent") {
-	
-	var gasEstimate = await nftRush.methods.announceDailySpentWinners(req.body.session_id,
+	try {
+	  gasEstimate = await nftRush.methods.announceDailySpentWinners(req.body.session_id,
 								       
 								   req.body.wallets,
 								   req.body.amount)
 	  .estimateGas({ from: nftRushOwner.address }); 
+	} catch (e) {
+	    console.error(e);	    
+	    res.send('{"status": "error", "message":"error during daily spent gas estimation"}');
+	    return;
+	}
+	
+	var result = null;
 
-	var result = await nftRush.methods	
+	try{
+	    result = await nftRush.methods	
 	    .announceDailySpentWinners(req.body.session_id, req.body.wallets, req.body.amount)	
-	    .send({from: nftRushOwner.address, gasPrice: gasPrice, gas: gasEstimate * 3});	
+		.send({from: nftRushOwner.address, gasPrice: gasPrice, gas: gasEstimate * 3});
+	} catch (e) {
+	    console.error(e);	    
+	    res.send('{"status": "error", "message":"failed to announce daily spent winners"}');
+	    return;
+	}
 
-	console.log(result);	
+	console.log("daily spent tx: ", result.transactionHash);	
     } else if (req.body.type == "daily-minted") {
-	const gasEstimate = await nftRush.methods.announceDailyMintedWinners(req.body.session_id,
+
+	var gasEstimate = null;
+	try {
+	    gasEstimate = await nftRush.methods.announceDailyMintedWinners(req.body.session_id,
 								   req.body.wallets,
 								   req.body.amount)
-	      .estimateGas({ from: nftRushOwner.address });	
+		.estimateGas({ from: nftRushOwner.address });
+	} catch (e) {
+	    console.error(e);
+	    res.send('{"status": "error", "message":"failed to gas estimate for daily minted winners"}');	    
+	    return;
+	}
 
-	let result = await nftRush.methods	
+	var result = null;
+	try {
+	    result = await nftRush.methods	
 	    .announceDailyMintedWinners(req.body.session_id, req.body.wallets, req.body.amount)	
-	    .send({from: nftRushOwner.address, gasPrice: gasPrice, gas: gasEstimate * 3});	
+		.send({from: nftRushOwner.address, gasPrice: gasPrice, gas: gasEstimate * 3});
+	} catch (e) {
+	    console.error(e);
+	    res.send('{"status": "error", "message":"failed to announce daily minted winners"}');
+	    return;
+	}
 
-	console.log(result);	
+	console.log("daily minted tx: ", result.transactionHash);	
     }
-    
+
     res.send('{"status": "ok"}'); 
 })
 
@@ -90,10 +110,9 @@ app.listen(port, async function(){
     nftRushAddress = artifact.networks[networkId].address;
     nftRush = await blockchain.loadContract(blockchain.web3, nftRushAddress, artifact.abi);
 
-    crownsAddress = crownsArtifact.networks[networkId].address;    
+    crownsAddress = crownsArtifact.networks[networkId].address;
     crowns = await blockchain.loadContract(blockchain.web3, crownsAddress, crownsArtifact.abi);
 
-    
     console.log(`Contract interactor at port ${port}`);
 })
 
@@ -102,9 +121,38 @@ let calculateTotalPrize = function() {
     let total = 0;
     for(var i=1; i<=winnersAmount; i++) {
 	let amount = Math.round(rewardPrize / i);
-	total += amount;
-	console.log(total+" for "+i+" users");
+	total += amount;	
     }
 
     return total;
+};
+
+
+let approveCrowns = async function(gasPrice) {
+    // for now all type of leaderboard reward players with the same amount of
+    // CWS tokens.
+    // in the next versions, approving CWS tokens should be in the leaderboard blocks
+    var totalPrize = blockchain.web3.utils.toWei(calculateTotalPrize().toString());
+
+    var approveGasEstimate = null;
+    
+    try {
+     approveGasEstimate = await crowns.methods
+	  .approve(nftRushAddress, totalPrize)    
+	  .estimateGas({ from: nftRushOwner.address });    
+    } catch (e) {
+	console.error(e);
+	return false;
+    }
+
+    try {
+      await crowns.methods
+	.approve(nftRushAddress, totalPrize)
+	.send({from: nftRushOwner.address, gasPrice: gasPrice, gas: approveGasEstimate * 3});
+    } catch (e) {
+	console.error(e);
+	return false;
+    }
+
+    return true;
 };
