@@ -1,9 +1,9 @@
 let Web3 = require('web3');
-if (process.env.INFURA_URL == undefined) {
-    throw "No INFURA_URL environment variable found. Can not connect to blockchain";
+if (process.env.REMOTE_HTTP == undefined) {
+    throw "No REMOTE_HTTP environment variable found. Can not connect to blockchain";
     process.exit(1);
 }
-module.exports.web3 = new Web3(process.env.INFURA_URL);
+module.exports.web3 = new Web3(process.env.REMOTE_HTTP);
 
 module.exports.loadContract = async function(web3, address, abi) {
     let contract = await new web3.eth.Contract(abi, address)
