@@ -29,27 +29,27 @@ app.post('/set-leaderboard', async function (req, res) {
 
     const gasPrice = await blockchain.web3.eth.getGasPrice();
 
-	var gasEstimate = await nftRush.methods.addDailySpentWinners(req.body.session_id,
     if (req.body.type == "daily-spent") {
 	
+	var gasEstimate = await nftRush.methods.announceDailySpentWinners(req.body.session_id,
 								       
 								   req.body.wallets,
 								   req.body.amount)
-	  .estimateGas({ from: nftRushOwner.address });    
+	  .estimateGas({ from: nftRushOwner.address }); 
 
 	var result = await nftRush.methods	
-	    .addDailySpentWinners(req.body.session_id, req.body.wallets, req.body.amount)	
+	    .announceDailySpentWinners(req.body.session_id, req.body.wallets, req.body.amount)	
 	    .send({from: nftRushOwner.address, gasPrice: gasPrice, gas: gasEstimate * 3});	
 
 	console.log(result);	
-	const gasEstimate = await nftRush.methods.addDailyMintedWinners(req.body.session_id,
     } else if (req.body.type == "daily-minted") {
+	const gasEstimate = await nftRush.methods.announceDailyMintedWinners(req.body.session_id,
 								   req.body.wallets,
 								   req.body.amount)
 	      .estimateGas({ from: nftRushOwner.address });	
 
 	let result = await nftRush.methods	
-	    .addDailyMintedWinners(req.body.session_id, req.body.wallets, req.body.amount)	
+	    .announceDailyMintedWinners(req.body.session_id, req.body.wallets, req.body.amount)	
 	    .send({from: nftRushOwner.address, gasPrice: gasPrice, gas: gasEstimate * 3});	
 
 	console.log(result);	
