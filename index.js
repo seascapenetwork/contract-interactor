@@ -1,5 +1,6 @@
 let express = require('express');
 let blockchain = require('./blockchain');
+let profitCircus = require('./profit_circus');
 let fs = require('fs');
 const app = express()
 const port = 3000;
@@ -26,6 +27,25 @@ var crowns;                   // set during express listening
 
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+
+app.get('/profit-circus', async function (req, res) {
+    let ethString = req.query.ethPrice;
+    if (ethString == undefined) {
+	res.send(JSON.stringify({status: "error", message: "no ethPrice parameter"}));
+	return;
+    }
+    let ethPrice = parseFloat(ethString);
+    if (isNaN(ethPrice)) {
+	res.send(JSON.stringify({status: "error", message: "invalid ethPrice parameter"}));
+	return;
+    }
+    
+    let result = await profitCircus.fetchPairNecessaryData(ethPrice, networkId, crownsAddress);
+    if (result.error != undefined) {
+	result.status = "ok";
+    }
+    res.send(JSON.stringify(result));
+});
 
 // send a winner set transaction
 app.post('/set-leaderboard', async function (req, res) {
