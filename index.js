@@ -4,10 +4,6 @@ let fs = require('fs');
 const app = express()
 const port = 3000;
 
-let rewardPrize = 10; // first winner gets 10 CWS
-let winnersAmount = 10; // ten winners are tracked
-
-
 // add account from privatekey to web3 to sign contracts
 if (process.env.ACCOUNT_1 == undefined) {
     throw "No ACCOUNT_1 environment variable found. Can not connect to blockchain";
@@ -46,14 +42,22 @@ app.post('/set-leaderboard', async function (req, res) {
 	return;
     }
     
-    if (req.body.type == "daily-spent") {	
+    if (req.body.type == "daily") {	
 	var gasEstimate = null;
 
+	/*announceDailyWinners(uint256 _sessionId,
+			 address[10] memory _spentWinners,				  
+				  uint8 _spentWinnersAmount,
+			 address[10] memory _mintedWinners,				  
+				  uint8 _mintedWinnersAmount*/
+	
 	try {
-	  gasEstimate = await nftRush.methods.announceDailySpentWinners(req.body.session_id,
-								       
-								   req.body.wallets,
-								   req.body.amount)
+	    gasEstimate = await nftRush.methods.announceDailyWinners(
+		req.body.session_id,
+		req.body.spent_wallets,		
+		req.body.spent_amount,		
+		req.body.minted_wallets,		
+		req.body.minted_amount)
 	  .estimateGas({ from: nftRushOwner.address }); 
 	} catch (e) {
 	    console.error(e);	    
@@ -65,23 +69,35 @@ app.post('/set-leaderboard', async function (req, res) {
 
 	try{
 	    result = await nftRush.methods	
-	    .announceDailySpentWinners(req.body.session_id, req.body.wallets, req.body.amount)	
-		.send({from: nftRushOwner.address, gasPrice: gasPrice, gas: gasEstimate * 3});
+		.announceDailyWinners(
+		    req.body.session_id,
+		    req.body.spent_wallets,		    
+		    req.body.spent_amount,		    
+		    req.body.minted_wallets,		    
+		    req.body.minted_amount)
+		.send({
+		    from: nftRushOwner.address,
+		    gasPrice: gasPrice,
+		    gas: gasEstimate * 3
+		});	    
 	} catch (e) {
 	    console.error(e);	    
 	    res.send('{"status": "error", "message":"failed to announce daily spent winners"}');
 	    return;
 	}
 
-	console.log("daily spent tx: ", result.transactionHash);	
-    } else if (req.body.type == "daily-minted") {
-
+	console.log("Daily leaderboard winners were announnced! Txid: ", result.transactionHash);	
+    } else if (req.body.type == "all-time") {
 	var gasEstimate = null;
+	
 	try {
-	    gasEstimate = await nftRush.methods.announceDailyMintedWinners(req.body.session_id,
-								   req.body.wallets,
-								   req.body.amount)
-		.estimateGas({ from: nftRushOwner.address });
+	    gasEstimate = await nftRush.methods.announceAllTimeWinners(
+		req.body.session_id,		
+		req.body.spent_wallets,		
+		req.body.spent_amount,		
+		req.body.minted_wallets,		
+		req.body.minted_amount)
+		.estimateGas({ from: nftRushOwner.address });	    
 	} catch (e) {
 	    console.error(e);
 	    res.send('{"status": "error", "message":"failed to gas estimate for daily minted winners"}');	    
@@ -91,15 +107,24 @@ app.post('/set-leaderboard', async function (req, res) {
 	var result = null;
 	try {
 	    result = await nftRush.methods	
-	    .announceDailyMintedWinners(req.body.session_id, req.body.wallets, req.body.amount)	
-		.send({from: nftRushOwner.address, gasPrice: gasPrice, gas: gasEstimate * 3});
+		.announceAllTimeWinners(
+		    req.body.session_id,		    
+		    req.body.spent_wallets,		    
+		    req.body.spent_amount,		    
+		    req.body.minted_wallets,		    
+		    req.body.minted_amount)	
+		.send({
+		    from: nftRushOwner.address,
+		    gasPrice: gasPrice,
+		    gas: gasEstimate * 3
+		});
 	} catch (e) {
 	    console.error(e);
 	    res.send('{"status": "error", "message":"failed to announce daily minted winners"}');
 	    return;
 	}
 
-	console.log("daily minted tx: ", result.transactionHash);	
+	console.log("Alltime leaderboard winners were announced! Txid: ", result.transactionHash);	
     }
 
     res.send('{"status": "ok"}'); 
@@ -107,9 +132,12 @@ app.post('/set-leaderboard', async function (req, res) {
 
 app.listen(port, async function(){
     networkId = await blockchain.web3.eth.net.getId();
-    nftRushAddress = artifact.networks[networkId].address;
-    nftRush = await blockchain.loadContract(blockchain.web3, nftRushAddress, artifact.abi);
-
+    if (artifact.networks[networkId] !== undefined) {
+	nftRushAddress = artifact.networks[networkId].address;	
+	nftRush = await blockchain.loadContract(blockchain.web3,
+						nftRushAddress, artifact.abi);	
+    }
+	
     crownsAddress = crownsArtifact.networks[networkId].address;
     crowns = await blockchain.loadContract(blockchain.web3, crownsAddress, crownsArtifact.abi);
 
@@ -118,10 +146,11 @@ app.listen(port, async function(){
 
 
 let calculateTotalPrize = function() {
+    prizes = JSON.parse(process.env.NFT_RUSH_PRIZES);
+    
     let total = 0;
-    for(var i=1; i<=winnersAmount; i++) {
-	let amount = Math.round(rewardPrize / i);
-	total += amount;	
+    for(var i=1; i<=prizes.length; i++) {
+	total += prizes[i];
     }
 
     return total;
