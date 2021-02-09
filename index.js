@@ -152,13 +152,18 @@ app.post('/set-leaderboard', async function (req, res) {
 
 app.listen(port, async function(){
     networkId = await blockchain.web3.eth.net.getId();
+
     if (artifact.networks[networkId] !== undefined) {
 	nftRushAddress = artifact.networks[networkId].address;	
 	nftRush = await blockchain.loadContract(blockchain.web3,
 						nftRushAddress, artifact.abi);	
     }
 	
-    crownsAddress = crownsArtifact.networks[networkId].address;
+    if (networkId == 4) {
+	crownsAddress = "0x168840Df293413A930d3D40baB6e1Cd8F406719D";
+    } else {
+	crownsAddress = crownsArtifact.networks[networkId].address;	
+    }
     crowns = await blockchain.loadContract(blockchain.web3, crownsAddress, crownsArtifact.abi);
 
     console.log(`Contract interactor at port ${port}`);
