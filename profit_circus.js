@@ -20,7 +20,7 @@ module.exports = {
 	    return {cwsPrice: cwsPrice, ethAmount: ethAmount};	    
 	} catch (error) {	    
 	    console.log(error);
-	    return {status: "error", message: error.response.body};
+	    return {status: "error", message: error};
 	}	
     }
 };
