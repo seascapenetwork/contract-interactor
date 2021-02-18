@@ -1,6 +1,7 @@
 let express = require('express');
 let blockchain = require('./blockchain');
 let profitCircus = require('./profit_circus');
+let profitCircusBsc = require('./profit_circus_bsc');
 let fs = require('fs');
 const app = express()
 const port = 3000;
@@ -24,25 +25,26 @@ var crownsArtifact = JSON.parse(fs.readFileSync('./abi/CrownsToken.json', 'utf8'
 var crownsAddress = null;     // set during express listening
 var crowns;                   // set during express listening
 
+// address and abi of the Dex Lp token
+var lpArtifact = JSON.parse(fs.readFileSync('./abi/UniswapV2Pair.json', 'utf8'));
+var lp;
+
+var blockchains = {4: profitCircus, 97: profitCircusBsc};
 
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
 app.get('/profit-circus', async function (req, res) {
-    let ethString = req.query.ethPrice;
-    if (ethString == undefined) {
-	res.send(JSON.stringify({status: "error", message: "no ethPrice parameter"}));
-	return;
-    }
-    let ethPrice = parseFloat(ethString);
-    if (isNaN(ethPrice)) {
-	res.send(JSON.stringify({status: "error", message: "invalid ethPrice parameter"}));
-	return;
-    }
-    
-    let result = await profitCircus.fetchPairNecessaryData(ethPrice, networkId, crownsAddress);
+    let game = blockchains[networkId];
+
+	if (typeof game === "undefined") {
+		res.send(JSON.stringify({status: "error", message: "no profit circus game on network "+networkId}));
+		return;
+	}
+
+    let result = await game.fetchPairNecessaryData(lp);
     if (result.error != undefined) {
-	result.status = "ok";
+		result.status = "ok";
     }
     res.send(JSON.stringify(result));
 });
@@ -154,19 +156,16 @@ app.listen(port, async function(){
     networkId = await blockchain.web3.eth.net.getId();
 
     if (artifact.networks[networkId] !== undefined) {
-	nftRushAddress = artifact.networks[networkId].address;	
-	nftRush = await blockchain.loadContract(blockchain.web3,
-						nftRushAddress, artifact.abi);	
+		nftRushAddress = artifact.networks[networkId].address;	
+		nftRush = await blockchain.loadContract(blockchain.web3, nftRushAddress, artifact.abi);	
     }
 	
-    if (networkId == 4) {
-	crownsAddress = "0x168840Df293413A930d3D40baB6e1Cd8F406719D";
-    } else {
-	crownsAddress = crownsArtifact.networks[networkId].address;	
-    }
+	crownsAddress = process.env.CROWNS_ADDRESS;
     crowns = await blockchain.loadContract(blockchain.web3, crownsAddress, crownsArtifact.abi);
 
-    console.log(`Contract interactor at port ${port}`);
+	lp = await blockchain.loadContract(blockchain.web3, process.env.LP_ADDRESS, lpArtifact.abi);
+
+    console.log(`Contract interactor at port ${port} for blockchain network: ${networkId}`);
 })
 
 
@@ -204,8 +203,8 @@ let approveCrowns = async function(gasPrice) {
 	.approve(nftRushAddress, totalPrize)
 	.send({from: nftRushOwner.address, gasPrice: gasPrice, gas: approveGasEstimate * 3});
     } catch (e) {
-	console.error(e);
-	return false;
+		console.error(e);
+		return false;
     }
 
     return true;
