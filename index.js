@@ -1,10 +1,14 @@
 let blockchain = require('./blockchain');	 // to setup connection to a RPC Node
 let dailyLeaderboard = require('./daily_leaderboard');
 const schedule = require('node-schedule');
-const { exec } = require('child_process');
+
+// or server to listen to sign up
+const express = require('express')
+const app = express()
+const port = 3000
 
 // account
-let nftRushOwner = blockchain.addAccount(process.env.ACCOUNT_1);
+let admin = blockchain.addAccount(process.env.ACCOUNT_1);
 
 let crowns;
 let nftRush;
@@ -36,10 +40,10 @@ let execDailyLeaderboard = async function() {
 	console.log(data);
 
 
-	let txid = await dailyLeaderboard.setDailyLeaderboard(nftRush, data, nftRushOwner);
-	console.log("Daily leaderboard winners announnced! Txid: ", txid, " for ", nftRushOwner.address);
+	let txid = await dailyLeaderboard.setDailyLeaderboard(nftRush, data, admin);
+	console.log("Daily leaderboard winners announnced! Txid: ", txid, " for ", admin.address);
 
-	//let claimed = await dailyLeaderboard.claimSpents(nftRush, nftRushOwner);
+	//let claimed = await dailyLeaderboard.claimSpents(nftRush, admin);
 	//console.log("Claimed daily leaderboard txid: "+claimed);
 };
 
@@ -90,7 +94,7 @@ let approveCrowns = async function(data, type) {
 	let nftRush = await getNftRush();
 
 	try {
-     	approveGasEstimate = await crowns.methods.approve(nftRush._address, totalPrize).estimateGas({ from: nftRushOwner.address });    
+     	approveGasEstimate = await crowns.methods.approve(nftRush._address, totalPrize).estimateGas({ from: admin.address });    
     } catch (e) {
 		console.log("Failed to count approvement!");
 		console.error(e);
@@ -99,7 +103,7 @@ let approveCrowns = async function(data, type) {
 
 
     try {
-      	await crowns.methods.approve(nftRush._address, totalPrize).send({from: nftRushOwner.address, gasPrice: gasPrice, gas: approveGasEstimate * 3});
+      	await crowns.methods.approve(nftRush._address, totalPrize).send({from: admin.address, gasPrice: gasPrice, gas: approveGasEstimate * 3});
     } catch (e) {
 		console.error(e);
 		return false;
@@ -111,4 +115,25 @@ let approveCrowns = async function(data, type) {
 // uncomment/comment to execute leaderboard immiadetely
 //execDailyLeaderboard();
 
-schedule.scheduleJob('0 0 * * *', execDailyLeaderboard);
+app.get('/sign', async function(req, res) {
+	let message = req.query.message;
+	if (!message) {
+		res.send("");
+	} else {
+		let signature;
+
+		try {
+			// Signature could be signed in other method:
+			// https://gist.github.com/belukov/3bf74d8e99fb5b8ad697e881fca31929
+			signature = await blockchain.web3.eth.sign(message, admin.address);
+		} catch (e) {
+			signature = "";
+		}
+
+		res.send(signature);
+	}
+})
+
+app.listen(port, () => {
+	schedule.scheduleJob('0 0 * * *', execDailyLeaderboard);
+});
