@@ -142,7 +142,7 @@ app.get('/sign-quality', async function(req, res) {
 	// ------------------------------------------------------------------
 	let bytes32 = blockchain.web3.eth.abi.encodeParameters(["uint256", "uint256"],[amountWei, mintedTime]);
 	let bytes1 = blockchain.web3.utils.bytesToHex([quality]);
-	let str = addr + bytes32.substr(2) + bytes1.substr(2);
+	let str = owner + bytes32.substr(2) + bytes1.substr(2);
 	let data = blockchain.web3.utils.keccak256(str);
 
 
