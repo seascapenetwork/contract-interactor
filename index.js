@@ -140,10 +140,10 @@ app.get('/sign-quality', async function(req, res) {
 	// ------------------------------------------------------------------
 	// merging parameters into one message
 	// ------------------------------------------------------------------
-	let bytes32 = web3.eth.abi.encodeParameters(["uint256", "uint256"],[amountWei, mintedTime]);
-	let bytes1 = web3.utils.bytesToHex([quality]);
+	let bytes32 = blockchain.web3.eth.abi.encodeParameters(["uint256", "uint256"],[amountWei, mintedTime]);
+	let bytes1 = blockchain.web3.utils.bytesToHex([quality]);
 	let str = addr + bytes32.substr(2) + bytes1.substr(2);
-	let data = web3.utils.keccak256(str);
+	let data = blockchain.web3.utils.keccak256(str);
 
 
 	let signature;
