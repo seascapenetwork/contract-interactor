@@ -115,23 +115,50 @@ let approveCrowns = async function(data, type) {
 // uncomment/comment to execute leaderboard immiadetely
 //execDailyLeaderboard();
 
-app.get('/sign', async function(req, res) {
-	let message = req.query.message;
-	if (!message) {
-		res.send("");
-	} else {
-		let signature;
+/**
+ * We suppose that all GET parameters are valid and always passed.
+ * 
+ * GET parameters:
+ * 	quality 		(integer)
+ * 	owner 			(address)
+ * 	amountWei		(integer in wei)
+ * 	mintedTime		(integer)
+ */
+app.get('/sign-quality', async function(req, res) {
+	// ----------------------------------------------------------------
+	// incoming parameters
+	// ----------------------------------------------------------------
+	let quality = parseInt(req.query.quality);
+	let owner = req.query.owner;
+	let amountWei = web3.utils.toWei(web3.utils.fromWei(req.query.amount));
+	let mintedTime = parseInt(req.query.mintedTime.toString());
 
-		try {
-			// Signature could be signed in other method:
-			// https://gist.github.com/belukov/3bf74d8e99fb5b8ad697e881fca31929
-			signature = await blockchain.web3.eth.sign(message, admin.address);
-		} catch (e) {
-			signature = "";
-		}
+	console.log("Parameters: owner, amount, minted time, quality:  ", owner, amountWei, mintedTime, quality);
+	console.log("Signer: "+admin.address);
 
-		res.send(signature);
+
+	// ------------------------------------------------------------------
+	// merging parameters into one message
+	// ------------------------------------------------------------------
+	let bytes32 = web3.eth.abi.encodeParameters(["uint256", "uint256"],[amountWei, mintedTime]);
+	let bytes1 = web3.utils.bytesToHex([quality]);
+	let str = addr + bytes32.substr(2) + bytes1.substr(2);
+	let data = web3.utils.keccak256(str);
+
+
+	let signature;
+	try {
+		// Signature could be signed in other method:
+		// https://gist.github.com/belukov/3bf74d8e99fb5b8ad697e881fca31929
+		signature = await blockchain.web3.eth.sign(data, admin.address);
+	} catch (e) {
+		signature = "";
 	}
+
+	console.log("Signature: "+signature);
+
+
+	res.send(signature);
 })
 
 app.listen(port, () => {
