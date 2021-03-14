@@ -161,6 +161,83 @@ app.get('/sign-quality', async function(req, res) {
 	res.send(signature);
 })
 
+/**
+ * We suppose that all GET parameters are valid and always passed.
+ * 
+ * GET parameters:
+ * 	nftId 			(integer)
+ * 	scapePoints		(integer)
+ */
+ app.get('/sign-nft-scape-points', async function(req, res) {
+	// ----------------------------------------------------------------
+	// incoming parameters
+	// ----------------------------------------------------------------
+	let nftId = parseInt(req.query.nftId);
+	let scapePoints = parseInt(req.query.scapePoints);
+
+	// ------------------------------------------------------------------
+	// merging parameters into one message
+	// ------------------------------------------------------------------
+	let bytes32 = blockchain.web3.eth.abi.encodeParameters(["uint256", "uint256"],[nftId, scapePoints]);
+	let data = blockchain.web3.utils.keccak256(bytes32);
+
+	let signature;
+	try {
+		// Signature could be signed in other method:
+		// https://gist.github.com/belukov/3bf74d8e99fb5b8ad697e881fca31929
+		signature = await blockchain.web3.eth.sign(data, admin.address);
+	} catch (e) {
+		signature = "";
+	}
+
+	console.log("Signature: "+signature);
+
+
+	res.send(signature);
+})
+
+
+/**
+ * We suppose that all GET parameters are valid and always passed.
+ * 
+ * GET parameters:
+ * 	bonus 			(integer)
+ * 	nftId 			(integer)
+ */
+ app.get('/sign-nft-staking-bonus', async function(req, res) {
+	// ----------------------------------------------------------------
+	// incoming parameters
+	// ----------------------------------------------------------------
+	let bonus = parseInt(req.query.bonus);
+	let nftId1 = parseInt(req.query.nftId1);
+	let nftId2 = parseInt(req.query.nftId2);
+	let nftId3 = parseInt(req.query.nftId3);
+
+	// ------------------------------------------------------------------
+	// merging parameters into one message
+	// ------------------------------------------------------------------
+	let bytes32 = blockchain.web3.eth.abi.encodeParameters(
+		["uint256", "uint256", "uint256", "uint256"],
+		[bonus, nftId1, nftId2, nftId3]);
+	let data = blockchain.web3.utils.keccak256(bytes32);
+
+	let signature;
+	try {
+		// Signature could be signed in other method:
+		// https://gist.github.com/belukov/3bf74d8e99fb5b8ad697e881fca31929
+		signature = await blockchain.web3.eth.sign(data, admin.address);
+	} catch (e) {
+		signature = "";
+	}
+
+	console.log("Signature: "+signature);
+
+
+	res.send(signature);
+})
+
+
+
 app.listen(port, () => {
 	schedule.scheduleJob('0 0 * * *', execDailyLeaderboard);
 });
