@@ -130,7 +130,7 @@ app.get('/sign-quality', async function(req, res) {
 	// ----------------------------------------------------------------
 	let quality = parseInt(req.query.quality);
 	let owner = req.query.owner;
-	let amountWei = blockchain.web3.utils.toWei(blockchain.web3.utils.fromWei(req.query.amount));
+	let amountWei = blockchain.web3.utils.toWei(blockchain.web3.utils.fromWei(req.query.amountWei));
 	let mintedTime = parseInt(req.query.mintedTime.toString());
 
 	console.log("Parameters: owner, amount, minted time, quality:  ", owner, amountWei, mintedTime, quality);
