@@ -136,13 +136,16 @@ app.get('/sign-quality', async function(req, res) {
 	console.log("Parameters: owner, amount, minted time, quality:  ", owner, amountWei, mintedTime, quality);
 	console.log("Signer: "+admin.address);
 
+	let nonce = parseInt(req.query.nonce.toString());
 
 	// ------------------------------------------------------------------
 	// merging parameters into one message
 	// ------------------------------------------------------------------
 	let bytes32 = blockchain.web3.eth.abi.encodeParameters(["uint256", "uint256"],[amountWei, mintedTime]);
+	let nonceBytes32 = blockchain.web3.eth.abi.encodeParameters(["uint256"],[nonce]);
+
 	let bytes1 = blockchain.web3.utils.bytesToHex([quality]);
-	let str = owner + bytes32.substr(2) + bytes1.substr(2);
+	let str = owner + bytes32.substr(2) + bytes1.substr(2) + nonceBytes32.substr(2);
 	let data = blockchain.web3.utils.keccak256(str);
 
 
