@@ -29,6 +29,9 @@ let getNftRush = async function() {
 
 let execDailyLeaderboard = async function() {
 	let data = await dailyLeaderboard.calculateDailyWinners();
+	if (!data) {
+		return;
+	}
 
 	let approvement = await approveCrowns(data, 'daily');
 	if (approvement === false) {
