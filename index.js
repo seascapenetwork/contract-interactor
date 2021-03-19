@@ -1,5 +1,6 @@
 let blockchain = require('./blockchain');	 // to setup connection to a RPC Node
 let dailyLeaderboard = require('./daily_leaderboard');
+let allTimeLeaderboard = require('./alltime_leaderboard');
 const schedule = require('node-schedule');
 
 // or server to listen to sign up
@@ -42,9 +43,27 @@ let execDailyLeaderboard = async function() {
 
 	let txid = await dailyLeaderboard.setDailyLeaderboard(nftRush, data, admin);
 	console.log("Daily leaderboard winners announnced! Txid: ", txid, " for ", admin.address);
+};
 
-	//let claimed = await dailyLeaderboard.claimSpents(nftRush, admin);
-	//console.log("Claimed daily leaderboard txid: "+claimed);
+let execAllTimeLeaderboard = async function() {
+	let data = await allTimeLeaderboard.calculateAllTimeWinners();
+	if (!data) {
+		return;
+	}
+
+	let approvement = await approveCrowns(data, 'alltime');
+	if (approvement === false) {
+		console.log("Failed to approve required amount of CWS. Not enough balance");
+		return;
+	}
+
+	let nftRush = await getNftRush();
+
+	console.log(data);
+
+
+	let txid = await allTimeLeaderboard.setAllTImeLeaderboard(nftRush, data, admin);
+	console.log("All Time leaderboard winners announnced! Txid: ", txid, " for ", admin.address);
 };
 
 let calculateTotalPrize = function(data, type) {
@@ -239,4 +258,5 @@ app.get('/sign-quality', async function(req, res) {
 
 app.listen(port, () => {
 	schedule.scheduleJob('0 0 * * *', execDailyLeaderboard);
+	schedule.scheduleJob('0 0 * * *', execAllTimeLeaderboard);
 });
