@@ -179,8 +179,8 @@ let isActiveSession = async function(session) {
 };
 
 let getSpentDay = async function(sessionId, beginDate, endDate) {
-	let sql = `SELECT wallet_address, MAX(amount) as amounts FROM spent_leaderboards WHERE date_time >= '${beginDate.toMysqlFormat()}' AND date_time <= '${endDate.toMysqlFormat()}' AND\
-	session_id = '${sessionId}' GROUP BY wallet_address ORDER BY MAX(amount) DESC LIMIT 10 `;
+	let sql = `SELECT wallet_address, SUM(amount) as amounts FROM spent_leaderboards WHERE date_time >= '${beginDate.toMysqlFormat()}' AND date_time <= '${endDate.toMysqlFormat()}' AND\
+	session_id = '${sessionId}' GROUP BY wallet_address ORDER BY SUM(amount) DESC LIMIT 10 `;
 
 	let con = await getCon();
 
