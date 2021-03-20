@@ -74,24 +74,17 @@ let calculateTotalPrize = function(data, type) {
 		return 0;
 	}
 
-	let spentPrizes = [];
-	let mintedPrizes = [];
+	let prizes = [];
 	if (type === 'daily') {
-		spentPrizes = JSON.parse(process.env.NFT_RUSH_DAILY_SPENT_PRIZES);
-		mintedPrizes = JSON.parse(process.env.NFT_RUSH_DAILY_MINTED_PRIZES);
+		prizes = JSON.parse(process.env.NFT_RUSH_DAILY_SPENT_PRIZES);
 	} else {
-		spentPrizes = JSON.parse(process.env.NFT_RUSH_ALLTIME_SPENT_PRIZES);
-		mintedPrizes = JSON.parse(process.env.NFT_RUSH_ALLTIME_MINTED_PRIZES);
+		prizes = JSON.parse(process.env.NFT_RUSH_ALLTIME_MINTED_PRIZES);
 	}
 
     let total = 0;
 
-	// spent
 	for(var i = 0; i<data.spent_amount; i++) {
-		total += spentPrizes[i];
-    }
-	for(var i = 0; i<data.minted_amount; i++) {
-		total += mintedPrizes[i];
+		total += prizes[i];
     }
 
     return total;
