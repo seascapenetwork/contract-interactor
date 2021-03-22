@@ -146,7 +146,7 @@ let isActiveSession = async function(session) {
 
 	let today = new Date();
 
-	return session.end_time.getTime() <= today.getTime();
+	return session.end_time.getTime() >= today.getTime();
 };
 
 let getSpentDay = async function(sessionId, beginDate, endDate) {

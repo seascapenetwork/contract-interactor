@@ -111,14 +111,14 @@ let getMintedWinners = async function(session) {
 	return {wallets: wallets, amount: leaderboard.length};
 }
 
-let isActiveSession = async function(session) {
+let isActiveSession = function(session) {
     if (!session) {
 		return false;
 	}
 
 	let today = new Date();
 
-	return session.end_time.getTime() <= today.getTime();
+	return session.end_time.getTime() >= today.getTime();
 };
 
 let getMintedAllTime = async function(sessionId) {
