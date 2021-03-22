@@ -83,7 +83,12 @@ let calculateTotalPrize = function(data, type) {
 
     let total = 0;
 
-	for(var i = 0; i<data.spent_amount; i++) {
+	let amount = data.spent_amount;
+	if (type === 'alltime') {
+		amount = data.minted_amount;
+	}
+
+	for(var i = 0; i<amount; i++) {
 		total += prizes[i];
     }
 
