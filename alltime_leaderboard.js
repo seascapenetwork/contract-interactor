@@ -41,6 +41,8 @@ module.exports.setAllTimeLeaderboard = async function(nftRush, data, nftRushOwne
 	};
 	var result = await nftRush.methods.announceAllTimeMintedWinners(data.session_id, data.minted_wallets, data.minted_amount).send(params);
 	
+	await setAllTimeAnnounced(data.session_id);
+
 	return 	result.transactionHash;
 };
 
@@ -81,8 +83,6 @@ module.exports.calculateAllTimeWinners = async function() {
     if (!isActiveSession(session) && !session.all_time_announced) {
       	let minted = await getMintedWinners(session)
 		  
-	  	await setAllTimeAnnounced(session.id);
-
       	return {
 			"session_id": session.id,	    
 			"spent_amount": 0,	    
