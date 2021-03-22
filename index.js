@@ -65,7 +65,7 @@ let execAllTimeLeaderboard = async function() {
 	console.log(data);
 
 
-	let txid = await allTimeLeaderboard.setAllTImeLeaderboard(nftRush, data, admin);
+	let txid = await allTimeLeaderboard.setAllTimeLeaderboard(nftRush, data, admin);
 	console.log("All Time leaderboard winners announnced! Txid: ", txid, " for ", admin.address);
 };
 
