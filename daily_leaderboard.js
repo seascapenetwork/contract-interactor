@@ -110,16 +110,27 @@ module.exports.calculateDailyWinners = async function() {
 	}
 };
 
-let getYesterday = function() {
+let getYesterday = function(date) {
+	let min = 0;
+	let sec = 0;
+	let hour = 0;
+	let ms = 0;
+	if (date) {
+		min = date.getUTCMinutes();
+		hour = date.getUTCHours();
+		sec = date.getUTCSeconds();
+		ms = date.getUTCMilliseconds();
+	}
+
 	let beginDate = new Date(); 
-	beginDate.setHours(0,0,0,0);
+	beginDate.setHours(hour, min, sec, ms);
 	beginDate.setDate(beginDate.getDate() - 1);
 	return beginDate;
 };
 
 let getSpentWinners = async function(session) {
-	let beginDate = getYesterday();
-	let endDate = getYesterday();
+	let beginDate = getYesterday(session.start_time);
+	let endDate = getYesterday(session.start_time);
     endDate = new Date(endDate.setDate(endDate.getDate() + 1));
 
 	let leaderboard = await getSpentDay(session.id, beginDate, endDate)
