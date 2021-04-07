@@ -27,6 +27,7 @@
     "@ethersproject/providers": "^5.0.21",
     "@ethersproject/solidity": "^5.0.9",
     "@uniswap/sdk": "^3.0.3",
+    "command-line-args": "^5.1.1",
     "express": "^4.17.1",
     "got": "^9.6.0",
     "mysql": "^2.18.1",
