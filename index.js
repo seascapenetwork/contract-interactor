@@ -258,6 +258,6 @@ app.get('/sign-quality', async function(req, res) {
 
 
 app.listen(port, () => {
-	schedule.scheduleJob('0 0 * * *', execDailyLeaderboard);
+	schedule.scheduleJob('0 * * * *', execDailyLeaderboard);
 	schedule.scheduleJob('0 0 * * *', execAllTimeLeaderboard);
 });
