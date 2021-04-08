@@ -128,7 +128,7 @@ let logSpents = async function(fromBlock, toBlock, sessionId) {
     for (var i = 0; i<events.length; i++) {
         let event = events[i];
 
-        let params = decomposeSpent(event);
+        let params = await decomposeSpent(event);
 
         if (params.sessionId != sessionId) {
             continue;
@@ -214,7 +214,7 @@ let logMints = async function(fromBlock, toBlock, sessionId) {
     for (var i = 0; i<events.length; i++) {
         let event = events[i];
 
-        let params = decomposeMint(event);
+        let params = await decomposeMint(event);
 
         if (params.sessionId != sessionId) {
             continue;
