@@ -43,19 +43,17 @@ let convertToMysqlFormat = function(date) {
 //
 //////////////////////////////////////////////////////////////////////////////
 
-let decomposeSpent = function(event) {
+let decomposeSpent =  async function(event) {
     nonIndexed = web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256', 'uint256'], event.data);
 
     let walletAddress = ("0x" + event.topics[1].substr(26)).toLowerCase();
     let sessionId = parseInt(nonIndexed[0]);
-
-    //timestamp = Map.get(log, "timestamp", DateTime.utc_now() |> DateTime.to_unix(:second))
-    let timestamp = new Date();
+    let blockInfo = await web3.eth.getBlock(event.blockNumber);
 
     return {
         txid: event.transactionHash.toLowerCase(),
         amount: web3.utils.fromWei(nonIndexed[3]),
-        dateTime: timestamp,
+        dateTime: new Date(blockInfo.timestamp*1000),
         sessionId: sessionId,
         walletAddress: walletAddress
     };
@@ -130,9 +128,9 @@ let logSpents = async function(fromBlock, toBlock, sessionId) {
     for (var i = 0; i<events.length; i++) {
         let event = events[i];
 
-        let params = decomposeSpent(event);
+        let params = await decomposeSpent(event);
 
-        if (params.sessionId !== sessionId) {
+        if (params.sessionId != sessionId) {
             continue;
         }
 
@@ -149,16 +147,18 @@ let logSpents = async function(fromBlock, toBlock, sessionId) {
 //
 //////////////////////////////////////////////////////////////////////////////
 
-let decomposeMint = function(event) {
+let decomposeMint = async function(event) {
     //    event Minted(address indexed owner, uint256 sessionId, uint256 nftId);
     nonIndexed = web3.eth.abi.decodeParameters(['uint256', 'uint256'], event.data);
+
+    let blockInfo = await web3.eth.getBlock(event.blockNumber);
 
     return {
         txid: event.transactionHash.toLowerCase(),
         walletAddress: ("0x" + event.topics[1].substr(26)).toLowerCase(),
         sessionId: parseInt(nonIndexed[0]),
         nftId: parseInt(nonIndexed[1]),
-        dateTime: new Date()
+        dateTime: new Date(blockInfo.timestamp*1000)
     }
 };
 
@@ -214,9 +214,9 @@ let logMints = async function(fromBlock, toBlock, sessionId) {
     for (var i = 0; i<events.length; i++) {
         let event = events[i];
 
-        let params = decomposeMint(event);
+        let params = await decomposeMint(event);
 
-        if (params.sessionId !== sessionId) {
+        if (params.sessionId != sessionId) {
             continue;
         }
 
