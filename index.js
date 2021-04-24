@@ -175,9 +175,6 @@ app.get('/sign-quality', async function(req, res) {
 		signature = "";
 	}
 
-	console.log("Signature: "+signature);
-
-
 	res.send(signature);
 })
 
@@ -209,9 +206,6 @@ app.get('/sign-quality', async function(req, res) {
 	} catch (e) {
 		signature = "";
 	}
-
-	console.log("Signature: "+signature);
-
 
 	res.send(signature);
 })
@@ -249,9 +243,6 @@ app.get('/sign-quality', async function(req, res) {
 	} catch (e) {
 		signature = "";
 	}
-
-	console.log("Signature: "+signature);
-
 
 	res.send(signature);
 })
