@@ -10,6 +10,7 @@ const port = 3000
 
 // account
 let admin = blockchain.addAccount(process.env.ACCOUNT_1);
+let stakingSaloonDeployer = blockchain.addAccount(process.env.STAKING_SALOON_DEPLOYER);
 
 let crowns;
 let nftRush;
@@ -204,7 +205,7 @@ app.get('/sign-quality', async function(req, res) {
 	try {
 		// Signature could be signed in other method:
 		// https://gist.github.com/belukov/3bf74d8e99fb5b8ad697e881fca31929
-		signature = await blockchain.web3.eth.sign(data, admin.address);
+		signature = await blockchain.web3.eth.sign(data, stakingSaloonDeployer.address);
 	} catch (e) {
 		signature = "";
 	}
@@ -244,7 +245,7 @@ app.get('/sign-quality', async function(req, res) {
 	try {
 		// Signature could be signed in other method:
 		// https://gist.github.com/belukov/3bf74d8e99fb5b8ad697e881fca31929
-		signature = await blockchain.web3.eth.sign(data, admin.address);
+		signature = await blockchain.web3.eth.sign(data, stakingSaloonDeployer.address);
 	} catch (e) {
 		signature = "";
 	}
