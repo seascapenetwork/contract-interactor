@@ -39,27 +39,30 @@ let convertToMysqlFormat = function(date) {
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  spent event tracking
+//  deposit event tracking
 //
 //////////////////////////////////////////////////////////////////////////////
 
-let decomposeSpent =  async function(event) {
-    nonIndexed = web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256', 'uint256'], event.data);
+let decomposeDeposit =  async function(event) {
+    nonIndexed = web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256'], event.data);
 
     let walletAddress = ("0x" + event.topics[1].substr(26)).toLowerCase();
     let sessionId = parseInt(nonIndexed[0]);
-    let blockInfo = await web3.eth.getBlock(event.blockNumber);
+    let nftId = parseInt(nonIndexed[1]);
+    let slotId = parrseInt(nonIndexed[2]);
+    let blockNumber = await web3.eth.getBlock(event.blockNumber);
 
     return {
         txid: event.transactionHash.toLowerCase(),
-        amount: web3.utils.fromWei(nonIndexed[3]),
-        dateTime: new Date(blockInfo.timestamp*1000),
         sessionId: sessionId,
-        walletAddress: walletAddress
+        walletAddress: walletAddress,
+        blockNumber: blockNumber,
+        slotId: slotId,
+        nftId: nftId
     };
 };
 
-let isSpentLoggedOnDb = async function(txid) {
+let isDepositLoggedOnDb = async function(txid) {
     let sql = `SELECT wallet_address FROM spent_leaderboards WHERE txid = '${txid}' `;
 
     let con = await getCon();
@@ -71,33 +74,21 @@ let isSpentLoggedOnDb = async function(txid) {
             } 
             else {
                 let amount = res.length;
-
-                if (amount == 0) {
-                    sql = `SELECT wallet_address FROM spents WHERE txid = '${txid}' `;
-
-                    con.query(sql, function(err, spent_res, _fields) {
-                        if (err) {
-                            reject(false);
-                        } else {
-                            resolve(spent_res.length > 0);
-                        }
-                    });
-                } 
-                else {
-                    resolve(true);
-                }
+                
+                resolve(amount > 0);
             }
         });
     });
 }
 
-let logSpentOnDb = async function(params) {
-    let sql = `INSERT INTO spent_leaderboards (session_id, wallet_address,
-        date_time, amount, txid) VALUES (
+let logDepositOnDb = async function(params) {
+    let sql = `INSERT INTO nft_staking_deposits (session_id, wallet_address,
+        nft_id, slot_id, block_number, txid) VALUES (
         '${params.sessionId}',
         '${params.walletAddress}',
-        '${params.dateTime.toMysqlFormat()}',
-        '${params.amount}', 
+        '${params.nftId}',
+        '${params.slotId}',
+        '${params.blockNumber}',
         '${params.txid}')`;
 
     let con = await getCon();
@@ -117,26 +108,30 @@ let logSpentOnDb = async function(params) {
 let logDeposit = async function(fromBlock, toBlock, sessionId) {
     let topic = "0x91ede45f04a37a7c170f5c1207df3b6bc748dc1e04ad5e917a241d0f52feada3";
 
-	console.log("address: " + contractAddress);
-	console.log("topic: " + topic);
+    console.log("Checking deposits...")
+
     let events = await web3.eth.getPastLogs({
         address: contractAddress,
         topics: [topic],
         fromBlock: fromBlock,
         toBlock: toBlock
     })
+    .catch(e => {
+        console.log("Found an error");
+        console.log(e);
+    })
 
-    console.log(`    Found ${events.length} events of Spent!`);
+    console.log(`    Found ${events.length} events of Deposit!`);
     for (var i = 0; i<events.length; i++) {
         let event = events[i];
 
-        let params = await decomposeSpent(event);
+        let params = await decomposeDeposit(event);
 
         if (params.sessionId != sessionId) {
             continue;
         }
 
-	console.log(params);
+	    console.log(params);
 
         //let logged = await isSpentLoggedOnDb(params.txid);
         //if (!logged) {
