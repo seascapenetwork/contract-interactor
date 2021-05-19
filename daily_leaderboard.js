@@ -115,12 +115,6 @@ let getYesterday = function(date) {
 	let sec = 0;
 	let hour = 0;
 	let ms = 0;
-	if (date) {
-		min = date.getUTCMinutes();
-		hour = date.getUTCHours();
-		sec = date.getUTCSeconds();
-		ms = date.getUTCMilliseconds();
-	}
 
 	let beginDate = new Date(); 
 	beginDate.setHours(hour, min, sec, ms);
