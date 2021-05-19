@@ -256,6 +256,43 @@ app.get('/sign-quality', async function(req, res) {
 })
 
 
+app.get('/sign-scape-forum-quality', async function(req, res) {
+	// ----------------------------------------------------------------
+	// incoming parameters
+	// ----------------------------------------------------------------
+	let nft_id_1 = parseInt(req.query.nft_id_1);
+	let nft_id_2 = parseInt(req.query.nft_id_2);
+	let nft_id_3 = parseInt(req.query.nft_id_3);
+	let nft_id_4 = parseInt(req.query.nft_id_4);
+	let nft_id_5 = parseInt(req.query.nft_id_5);
+	let quality  = parseInt(req.query.quality);
+
+	// ------------------------------------------------------------------
+	// merging parameters into one message
+	// ------------------------------------------------------------------
+	let bytes32 = blockchain.web3.eth.abi.encodeParameters(["uint256", "uint256", "uint256", "uint256", "uint256"],[nft_id_1, nft_id_2, nft_id_3, nft_id_4, nft_id_5]);
+	let bytes1 = blockchain.web3.utils.bytesToHex([quality]);
+
+	let str = bytes32 + bytes1.substr(2);
+	let data = blockchain.web3.utils.keccak256(str);
+
+
+	let signature;
+	try {
+		// Signature could be signed in other method:
+		// https://gist.github.com/belukov/3bf74d8e99fb5b8ad697e881fca31929
+		signature = await blockchain.web3.eth.sign(data, admin.address);
+	} catch (e) {
+		signature = "";
+	}
+
+	console.log("Signature: "+signature);
+
+
+	res.send(signature);
+})
+
+
 
 app.listen(port, () => {
 	schedule.scheduleJob('0 * * * *', execDailyLeaderboard);
