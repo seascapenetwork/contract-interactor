@@ -259,11 +259,12 @@ app.get('/sign-scape-forum-quality', async function(req, res) {
 	let nft_id_4 = parseInt(req.query.nft_id_4);
 	let nft_id_5 = parseInt(req.query.nft_id_5);
 	let quality  = parseInt(req.query.quality);
-
+        let stakedInt = "0";        //remember to update accordingly or verification will fail
+        let totalStaked = web3.utils.toWei(stakedInt, "milli");
 	// ------------------------------------------------------------------
 	// merging parameters into one message
 	// ------------------------------------------------------------------
-	let bytes32 = blockchain.web3.eth.abi.encodeParameters(["uint256", "uint256", "uint256", "uint256", "uint256"],[nft_id_1, nft_id_2, nft_id_3, nft_id_4, nft_id_5]);
+	let bytes32 = blockchain.web3.eth.abi.encodeParameters(["uint256", "uint256", "uint256", "uint256", "uint256", "uint256"],[nft_id_1, nft_id_2, nft_id_3, nft_id_4, nft_id_5,totalStaked]);
 	let bytes1 = blockchain.web3.utils.bytesToHex([quality]);
 
 	let str = bytes32 + bytes1.substr(2);
