@@ -258,7 +258,6 @@ app.get('/sign-scape-forum-quality', async function (req, res) {
 	let nft_id_3 = parseInt(req.query.nft_id_3);
 	let nft_id_4 = parseInt(req.query.nft_id_4);
 	let nft_id_5 = parseInt(req.query.nft_id_5);
-	let nft_id_5 = parseInt(req.query.nft_id_5);
 	let quality = parseInt(req.query.quality);
 	let img_id = parseInt(req.query.img_id);
 	let stakedInt = "0";        //remember to update accordingly or verification will fail
