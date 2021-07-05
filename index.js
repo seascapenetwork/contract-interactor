@@ -247,23 +247,25 @@ app.get('/sign-nft-staking-bonus', async function (req, res) {
 
 
 app.get('/sign-scape-forum-quality', async function (req, res) {
+    console.log("===============================================")
+     console.log(req.query)
 	// ----------------------------------------------------------------
 	// incoming parameters
 	// ----------------------------------------------------------------
-	let nft_id_1 = parseInt(req.query.nft_id_1);
-	let nft_id_2 = parseInt(req.query.nft_id_2);
-	let nft_id_3 = parseInt(req.query.nft_id_3);
-	let nft_id_4 = parseInt(req.query.nft_id_4);
-	let nft_id_5 = parseInt(req.query.nft_id_5);
+	let nftId1 = parseInt(req.query.nftId1);
+	let nftId2 = parseInt(req.query.nftId2);
+	let nftId3 = parseInt(req.query.nftId3);
+	let nftId4 = parseInt(req.query.nftId4);
+	let nftId5 = parseInt(req.query.nftId5);
 	let quality = parseInt(req.query.quality);
-	let img_id = parseInt(req.query.img_id);
-
+	let imgId = parseInt(req.query.imgId);
 	let stakedInt = "0";        //remember to update accordingly or verification will fail
-	let totalStaked = blockchain.web3.utils.toWei(stakedInt, "ether");
+	let totalStaked = blockchain.web3.utils.toWei(stakedInt, "milli");
+	
 	// ------------------------------------------------------------------
 	// merging parameters into one message
 	// ------------------------------------------------------------------
-	let bytes32 = blockchain.web3.eth.abi.encodeParameters(["uint256", "uint256", "uint256", "uint256", "uint256", "uint256","uint256"], [nft_id_1, nft_id_2, nft_id_3, nft_id_4, nft_id_5, totalStaked,img_id]);
+	let bytes32 = blockchain.web3.eth.abi.encodeParameters(["uint256", "uint256", "uint256", "uint256", "uint256", "uint256","uint256"], [nftId1, nftId2, nftId3, nftId4, nftId5, totalStaked,imgId]);
 	let bytes1 = blockchain.web3.utils.bytesToHex([quality]);
 
 	let str = bytes32 + bytes1.substr(2);
