@@ -133,9 +133,6 @@ let approveCrowns = async function (data, type) {
 	return true;
 };
 
-// uncomment/comment to execute leaderboard immiadetely
-//execDailyLeaderboard();
-
 /**
  * We suppose that all GET parameters are valid and always passed.
  * 
@@ -289,6 +286,6 @@ app.get('/sign-scape-forum-quality', async function (req, res) {
 })
 
 app.listen(port, () => {
-      schedule.scheduleJob('0 * * * * *', execDailyLeaderboard);
-       schedule.scheduleJob('0 0 * * * *', execAllTimeLeaderboard);
+    //schedule.scheduleJob('0 * * * * *', execDailyLeaderboard);
+    //schedule.scheduleJob('0 0 * * * *', execAllTimeLeaderboard);
 });
