@@ -260,7 +260,7 @@ app.get('/sign-scape-forum-quality', async function (req, res) {
 	let quality = parseInt(req.query.quality);
 	let imgId = parseInt(req.query.imgId);
 	let stakedInt = req.query.stakedInt;        //remember to update accordingly or verification will fail
-	let totalStaked = blockchain.web3.utils.toWei(stakedInt, "milli");
+	let totalStaked = blockchain.web3.utils.toWei(stakedInt, "ether");
 	console.log('----------------------------------------------------------');
 	console.log(req.query);
 	// ------------------------------------------------------------------
