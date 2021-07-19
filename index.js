@@ -247,8 +247,6 @@ app.get('/sign-nft-staking-bonus', async function (req, res) {
 
 
 app.get('/sign-scape-forum-quality', async function (req, res) {
-    console.log("===============================================")
-     console.log(req.query)
 	// ----------------------------------------------------------------
 	// incoming parameters
 	// ----------------------------------------------------------------
@@ -260,7 +258,7 @@ app.get('/sign-scape-forum-quality', async function (req, res) {
 	let quality = parseInt(req.query.quality);
 	let imgId = parseInt(req.query.imgId);
 	let stakedInt = req.query.stakedInt;        //remember to update accordingly or verification will fail
-	let totalStaked = blockchain.web3.utils.toWei(stakedInt, "milli");
+	let totalStaked = blockchain.web3.utils.toWei(stakedInt, "ether");
 
 	// ------------------------------------------------------------------
 	// merging parameters into one message
