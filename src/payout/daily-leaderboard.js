@@ -1,5 +1,5 @@
-let blockchain = require('./blockchain');	 // to setup connection to a RPC Node
-let db = require('./db');
+let blockchain = require('../../blockchain');	 // to setup connection to a RPC Node
+let db = require('../../db');
 let con;
 let getCon = async function() {
 	if (!con) {
