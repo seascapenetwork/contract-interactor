@@ -4,7 +4,6 @@ const clear = require("clear");
 const inquirer = require("inquirer");
 const chalk = require("chalk");
 const figlet = require("figlet");
-const shell = require("shelljs");
 const clui = require('clui');
 const fs = require("fs");
 const Spinner = clui.Spinner;
