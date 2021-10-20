@@ -4,6 +4,10 @@ let allTimeLeaderboard = require('./alltime_leaderboard');
 const schedule = require('node-schedule');
 // or server to listen to sign up
 const express = require('express')
+
+const seadex = require("seadexswap");
+const {JsonRpcProvider} = require("@ethersproject/providers");
+
 const app = express()
 const port = 3000
 
@@ -283,6 +287,26 @@ app.get('/sign-scape-forum-quality', async function (req, res) {
 
 
 	res.send(signature);
+})
+
+app.get('/rib/price', async function(req, res) {
+	const provider = new JsonRpcProvider(process.env.REMOTE_HTTP);
+	const RIB = new seadex.Token(
+		seadex.ChainId.MOONRIVER,
+		process.env.RIB_ADDRESS,
+		18
+	);
+
+	let rib_price;
+	try {
+		const pair = await seadex.Fetcher.fetchPairData(RIB, seadex.WMOVR[RIB.chainId], provider);
+		const route = new seadex.Route([pair], RIB);
+		rib_price = route.midPrice.toSignificant(6);
+	} catch(e) {
+		rib_price = 0;
+	}
+
+	res.send(rib_price);
 })
 
 app.listen(port, () => {
