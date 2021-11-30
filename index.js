@@ -294,7 +294,7 @@ app.get('/rib/price', async function(req, res) {
 	const RIB = new seadex.Token(
 		seadex.ChainId.MOONRIVER,
 		process.env.RIB_ADDRESS,
-		18
+		9
 	);
 
 	let rib_price;
@@ -302,12 +302,9 @@ app.get('/rib/price', async function(req, res) {
 		const pair = await seadex.Fetcher.fetchPairData(RIB, seadex.WMOVR[RIB.chainId], provider);
 		const route = new seadex.Route([pair], RIB);
 		rib_price = route.midPrice.toSignificant(6);
-		console.log('=================================== /rib/price =========================================');
-		console.log({RIB: RIB, pair: pair, route: route, rib_price: rib_price});
 	} catch(e) {
 		rib_price = 0;
 	}
-	console.log(rib_price);
 	res.send(rib_price);
 })
 
