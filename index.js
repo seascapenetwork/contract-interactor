@@ -296,7 +296,6 @@ app.get('/sign-scape-forum-quality', async function (req, res) {
 	res.send(signature);
 })
 
-
 app.listen(port, () => {
     //schedule.scheduleJob('0 * * * * *', execDailyLeaderboard);
     //schedule.scheduleJob('0 0 * * * *', execAllTimeLeaderboard);
