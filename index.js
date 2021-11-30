@@ -294,7 +294,7 @@ app.get('/rib/price', async function(req, res) {
 	const RIB = new seadex.Token(
 		seadex.ChainId.MOONRIVER,
 		process.env.RIB_ADDRESS,
-		9
+		6
 	);
 
 	let rib_price;
