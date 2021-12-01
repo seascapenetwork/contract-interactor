@@ -290,21 +290,21 @@ app.get('/sign-scape-forum-quality', async function (req, res) {
 })
 
 app.get('/rib/price', async function(req, res) {
-	// const provider = new JsonRpcProvider(process.env.REMOTE_HTTP);
-	// const RIB = new seadex.Token(
-	// 	seadex.ChainId.MOONRIVER,
-	// 	process.env.RIB_ADDRESS,
-	// 	18
-	// );
-	//
+	const provider = new JsonRpcProvider(process.env.REMOTE_HTTP);
+	const RIB = new seadex.Token(
+		seadex.ChainId.MOONRIVER,
+		process.env.RIB_ADDRESS,
+		18
+	);
+
 	let rib_price;
-	// try {
-	// 	const pair = await seadex.Fetcher.fetchPairData(RIB, seadex.WMOVR[RIB.chainId], provider).catch(console.error);
-	// 	const route = new seadex.Route([pair], RIB);
-	// 	rib_price = route.midPrice.toSignificant(6);
-	// } catch(e) {
+	try {
+		const pair = await seadex.Fetcher.fetchPairData(RIB, seadex.WMOVR[RIB.chainId], provider).catch(console.error);
+		const route = new seadex.Route([pair], RIB);
+		rib_price = route.midPrice.toSignificant(6);
+	} catch(e) {
 		rib_price = '0.0025';
-	// }
+	}
 	res.send(rib_price);
 })
 
