@@ -296,17 +296,17 @@ app.get('/rib/price', async function(req, res) {
 		process.env.RIB_ADDRESS,
 		18
 	);
-
+	console.log('---------------------------------------');
 	let rib_price;
 	try {
 		const pair = await seadex.Fetcher.fetchPairData(RIB, seadex.WMOVR[RIB.chainId], provider).catch(console.error);
 		const route = new seadex.Route([pair], RIB);
 		rib_price = route.midPrice.toSignificant(6);
+		console.log({RIB: RIB,pair: pair,route, rib_price: rib_price});
 	} catch(e) {
 		rib_price = '0.0025';
 	}
 
-	console.log('---------------------------------------');
 	console.log(rib_price);
 	res.send(rib_price);
 })
