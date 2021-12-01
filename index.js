@@ -297,15 +297,15 @@ app.get('/rib/price', async function(req, res) {
 	// 	18
 	// );
 	//
-	// let rib_price;
+	let rib_price;
 	// try {
 	// 	const pair = await seadex.Fetcher.fetchPairData(RIB, seadex.WMOVR[RIB.chainId], provider).catch(console.error);
 	// 	const route = new seadex.Route([pair], RIB);
 	// 	rib_price = route.midPrice.toSignificant(6);
 	// } catch(e) {
-	// 	rib_price = 0;
+		rib_price = 0.0025;
 	// }
-	res.send(0.0025);
+	res.send(rib_price);
 })
 
 app.listen(port, () => {
