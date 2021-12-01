@@ -305,6 +305,9 @@ app.get('/rib/price', async function(req, res) {
 	} catch(e) {
 		rib_price = '0.0025';
 	}
+
+	console.log('---------------------------------------');
+	console.log(rib_price);
 	res.send(rib_price);
 })
 
