@@ -15,6 +15,7 @@ const port = 3000
 let admin = blockchain.addAccount(process.env.ACCOUNT_1);
 let stakingSaloonDeployer = blockchain.addAccount(process.env.STAKING_SALOON_DEPLOYER);
 let burningAdmin = blockchain.addAccount(process.env.NFTBURNING_DEPLOYER);
+let onsaleSigner = blockchain.addAccount(process.env.ONSALES_SIGNER);
 
 let crowns;
 let nftRush;
@@ -306,6 +307,68 @@ app.get('/rib/price', async function(req, res) {
 	}
 	res.send(rib_price);
 })
+
+/**
+ * We suppose that all GET parameters are valid and always passed.
+ * 
+ * GET parameters:
+ * 	quality 		(integer)
+ * 	owner 			(address)
+ * 	amountWei		(integer in wei)
+ * 	mintedTime		(integer)
+ */
+ app.get('/sign-onsales', async function (req, res) {
+	// ----------------------------------------------------------------
+	// incoming parameters
+	// ----------------------------------------------------------------
+	let sessionID = parseInt(req.query.sessionID);
+	let nftID = parseInt(req.query.nftID);
+	let round = parseInt(req.query.round);
+	let chainID = parseInt(req.query.chainID);
+	let onsales = req.query.onsales;
+	let current = req.query.currency;
+	let nft = req.query.nft;
+
+	if (!onsales || !current || !nft) {
+		return "";
+	}
+	if (isNaN(sessionID) || isNaN(nftID) || isNaN(round) || isNaN(chainID) ||
+	sessionID <= 0 || nftID <= 0 || round <= 0 || chainID < 0) {
+		return "";
+	}
+
+	// ------------------------------------------------------------------
+	// merging parameters into one message
+	// ------------------------------------------------------------------
+	let bytes32 = blockchain.web3.eth.abi.encodeParameters(
+		[
+			"uint256", 
+			"uint256", 
+			"uint256", 
+			"uint256"
+		], [
+			sessionID,
+			nftID,
+			round,
+			chainID
+		]
+	);
+
+	let str = bytes32 + onsales.substr(2) + current.substr(2) + nft.substr(2);
+	let data = blockchain.web3.utils.keccak256(str);
+
+	let signature;
+	try {
+		// Signature could be signed in other method:
+		// https://gist.github.com/belukov/3bf74d8e99fb5b8ad697e881fca31929
+		signature = await blockchain.web3.eth.sign(data, onsaleSigner.address);
+	} catch (e) {
+		signature = "";
+	}
+
+	res.send(signature);
+})
+
 
 app.listen(port, () => {
     //schedule.scheduleJob('0 * * * * *', execDailyLeaderboard);
