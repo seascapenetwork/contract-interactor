@@ -11,7 +11,7 @@ const port = 3000;
 let admin = blockchain.addAccount(process.env.ACCOUNT_1);
 let stakingSaloonDeployer = blockchain.addAccount(process.env.STAKING_SALOON_DEPLOYER);
 let burningAdmin = blockchain.addAccount(process.env.NFTBURNING_DEPLOYER);
-
+let zombieAdmin = blockchain.addAccount(process.env.ZOMBIE_DEPLOYER);
 let crowns;
 let nftRush;
 let getDate = function () {
@@ -185,7 +185,7 @@ app.get('/sign-quality', async function (req, res) {
 	}
 
 	res.send(signature);
-})
+});
 
 /**
  * We suppose that all GET parameters are valid and always passed.
@@ -217,7 +217,7 @@ app.get('/sign-nft-scape-points', async function (req, res) {
 	}
 
 	res.send(signature);
-})
+});
 
 
 /**
@@ -254,7 +254,7 @@ app.get('/sign-nft-staking-bonus', async function (req, res) {
 	}
 
 	res.send(signature);
-})
+});
 
 
 app.get('/sign-scape-forum-quality', async function (req, res) {
@@ -294,7 +294,59 @@ app.get('/sign-scape-forum-quality', async function (req, res) {
 
 
 	res.send(signature);
-})
+});
+
+app.get('/sign-zombie-farm-nft', async function (req, res) {
+	let amount = parseInt(req.query.amount);
+	let nftId = parseInt(req.query.nftId);
+	let nonce = parseInt(req.query.nonce.toString());
+
+
+	let bytesOnce = blockchain.web3.eth.abi.encodeParameters(["uint256", "uint256", "uint256"], [nftId,amount,nonce]);
+
+	let dataOnce = blockchain.web3.utils.keccak256(bytesOnce);
+
+	let signature;
+	try {
+		signature = await blockchain.web3.eth.sign(dataOnce, zombieAdmin.address);
+	} catch (e) {
+		signature = "";
+	}
+
+	let dot = signDot(signature);
+
+	let bytesTwice = blockchain.web3.eth.abi.encodeParameters(["uint256","uint8","bytes32","bytes32","uint256"], [amount,dot.v,dot.r,dot.s,nftId]);
+
+	// console.log(blockchain.web3.eth.abi.decodeParameters([{
+	// 	type: 'uint256',
+	// 	name: 'amount'
+	// },{
+	// 	type: 'uint8',
+	// 	name: 'v'
+	// },{
+	// 	type: 'bytes32',
+	// 	name: 'r'
+	// },{
+	// 	type: 'bytes32',
+	// 	name: 's'
+	// },{
+	// 	type: 'uint256',
+	// 	name: 'nftId'
+	// }], bytesTwice));
+
+	res.send(bytesTwice);
+});
+
+let signDot = (sign) => {
+	//r,s,v
+	let r = sign.substr(0,66);
+	let s = '0x' + sign.substr(66,64);
+	let v = parseInt(sign.substr(130),16);
+	if (v < 27) {
+		v += 27;
+	}
+	return {r: r,s: s,v: v}
+};
 
 app.listen(port, () => {
     //schedule.scheduleJob('0 * * * * *', execDailyLeaderboard);
