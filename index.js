@@ -296,7 +296,7 @@ app.get('/sign-scape-forum-quality', async function (req, res) {
 	res.send(signature);
 });
 
-app.get('/sign-zombie-farm-nft', async function (req, res) {
+app.get('/sign-zombie-farm-nft-token', async function (req, res) {
 	let amount = parseInt(req.query.amount);
 	let nftId = parseInt(req.query.nftId);
 	let nonce = parseInt(req.query.nonce.toString());
@@ -317,25 +317,72 @@ app.get('/sign-zombie-farm-nft', async function (req, res) {
 
 	let bytesTwice = blockchain.web3.eth.abi.encodeParameters(["uint256","uint8","bytes32","bytes32","uint256"], [amount,dot.v,dot.r,dot.s,nftId]);
 
-	// console.log(blockchain.web3.eth.abi.decodeParameters([{
-	// 	type: 'uint256',
-	// 	name: 'amount'
-	// },{
-	// 	type: 'uint8',
-	// 	name: 'v'
-	// },{
-	// 	type: 'bytes32',
-	// 	name: 'r'
-	// },{
-	// 	type: 'bytes32',
-	// 	name: 's'
-	// },{
-	// 	type: 'uint256',
-	// 	name: 'nftId'
-	// }], bytesTwice));
+	res.send(bytesTwice);
+});
+
+
+app.get('/sign-zombie-farm-nft', async function (req, res) {
+	let weight = parseInt(req.query.weight);
+	let nftId = parseInt(req.query.nftId);
+	let nonce = parseInt(req.query.nonce.toString());
+
+
+	let bytesOnce = blockchain.web3.eth.abi.encodeParameters(["uint256", "uint256", "uint256"], [nftId,weight,nonce]);
+
+	let dataOnce = blockchain.web3.utils.keccak256(bytesOnce);
+
+	let signature;
+	try {
+		signature = await blockchain.web3.eth.sign(dataOnce, zombieAdmin.address);
+	} catch (e) {
+		signature = "";
+	}
+
+	let dot = signDot(signature);
+
+	let bytesTwice = blockchain.web3.eth.abi.encodeParameters(["uint8","bytes32","bytes32","uint256","uint256",], [dot.v,dot.r,dot.s,nftId,weight]);
 
 	res.send(bytesTwice);
 });
+
+
+app.get('/sign-zombie-farm-nfts', async function (req, res) {
+	let nftId1 = parseInt(req.query.nftId1);
+	let nftId2 = parseInt(req.query.nftId2);
+	let nftId3 = parseInt(req.query.nftId3);
+	let nftId4 = parseInt(req.query.nftId4);
+	let nftId5 = parseInt(req.query.nftId5);
+
+	let weight1 = parseInt(req.query.weight1);
+	let weight2 = parseInt(req.query.weight3);
+	let weight3 = parseInt(req.query.weight3);
+	let weight4 = parseInt(req.query.weight4);
+	let weight5 = parseInt(req.query.weight5);
+
+	let nonce = parseInt(req.query.nonce.toString());
+
+	let nftIds = [nftId1,nftId2,nftId3,nftId4,nftId5];
+	let weights = [weight1,weight2,weight3,weight4,weight5];
+
+	let bytesOnce = blockchain.web3.eth.abi.encodeParameters(["uint256[5]", "uint256[5]", "uint256"], [nftIds,weights,nonce]);
+
+	let dataOnce = blockchain.web3.utils.keccak256(bytesOnce);
+
+	let signature;
+	try {
+		signature = await blockchain.web3.eth.sign(dataOnce, zombieAdmin.address);
+	} catch (e) {
+		signature = "";
+	}
+
+	let dot = signDot(signature);
+
+	let bytesTwice = blockchain.web3.eth.abi.encodeParameters(["uint8","bytes32","bytes32","uint256[5]","uint256[5]",], [dot.v,dot.r,dot.s,nftIds,weights]);
+
+	res.send(bytesTwice);
+});
+
+
 
 let signDot = (sign) => {
 	//r,s,v
