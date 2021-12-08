@@ -340,7 +340,7 @@ app.get('/sign-zombie-farm-nft', async function (req, res) {
 
 	let dot = signDot(signature);
 
-	let bytesTwice = blockchain.web3.eth.abi.encodeParameters(["uint8","bytes32","bytes32","uint256","uint256",], [dot.v,dot.r,dot.s,nftId,weight]);
+	let bytesTwice = blockchain.web3.eth.abi.encodeParameters(["uint8","bytes32","bytes32","uint256","uint256"], [dot.v,dot.r,dot.s,nftId,weight]);
 
 	res.send(bytesTwice);
 });
@@ -377,7 +377,7 @@ app.get('/sign-zombie-farm-nfts', async function (req, res) {
 
 	let dot = signDot(signature);
 
-	let bytesTwice = blockchain.web3.eth.abi.encodeParameters(["uint8","bytes32","bytes32","uint256[5]","uint256[5]",], [dot.v,dot.r,dot.s,nftIds,weights]);
+	let bytesTwice = blockchain.web3.eth.abi.encodeParameters(["uint8","bytes32","bytes32","uint256[5]","uint256[5]"], [dot.v,dot.r,dot.s,nftIds,weights]);
 
 	res.send(bytesTwice);
 });
