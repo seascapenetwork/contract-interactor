@@ -297,7 +297,7 @@ app.get('/sign-scape-forum-quality', async function (req, res) {
 });
 
 app.get('/sign-zombie-farm-nft-token', async function (req, res) {
-	let amount = parseInt(req.query.amount);
+	let amount = blockchain.web3.utils.toWei(req.query.amount, "ether");
 	let nftId = parseInt(req.query.nftId);
 	let nonce = parseInt(req.query.nonce.toString());
 
