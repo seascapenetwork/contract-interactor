@@ -2,6 +2,11 @@ let blockchain = require('./blockchain');	 // to setup connection to a RPC Node
 let dailyLeaderboard = require('./daily_leaderboard');
 let allTimeLeaderboard = require('./alltime_leaderboard');
 const schedule = require('node-schedule');
+
+const seadex = require("seadexswap");
+const {JsonRpcProvider} = require("@ethersproject/providers");
+
+
 // or server to listen to sign up
 const express = require('express');
 const app = express();
@@ -295,6 +300,24 @@ app.get('/sign-scape-forum-quality', async function (req, res) {
 
 	res.send(signature);
 });
+
+app.get('/rib/price', async function(req, res) {
+	const provider = new JsonRpcProvider(process.env.REMOTE_HTTP);
+	const RIB = new seadex.Token(
+		seadex.ChainId.MOONRIVER,
+		process.env.RIB_ADDRESS,
+		18
+	);
+	let rib_price;
+	try {
+		const pair = await seadex.Fetcher.fetchPairData(RIB, seadex.WMOVR[RIB.chainId], provider).catch(console.error);
+		const route = new seadex.Route([pair], RIB);
+		rib_price = route.midPrice.toSignificant(6);
+	} catch(e) {
+		rib_price = 0;
+	}
+	res.send(rib_price);
+})
 
 app.get('/sign-zombie-farm-nft-token', async function (req, res) {
 	let amount = blockchain.web3.utils.toWei(req.query.amount, "ether");
