@@ -406,6 +406,29 @@ app.get('/sign-zombie-farm-nfts', async function (req, res) {
 });
 
 
+app.get('/single-zombie', async function (req, res) {
+	let sessionId = parseInt(req.query.sessionId);
+	let levelId = parseInt(req.query.levelId);
+	let slotId = parseInt(req.query.slotId);
+	let challenge = req.query.challenge;
+	let owner = req.query.owner;
+
+	let sessionIdBytes = blockchain.web3.eth.abi.encodeParameters(["uint256"], [sessionId]);
+	let levelBytes = blockchain.web3.utils.bytesToHex([levelId]);
+	let slotBytes = blockchain.web3.utils.bytesToHex([slotId]);
+
+	let str = sessionIdBytes + levelBytes.substr(2) + slotBytes.substr(2) + challenge.substr(2) + owner.substr(2);
+
+	let data = blockchain.web3.utils.keccak256(str);
+
+	let signature;
+	try {
+		signature = await blockchain.web3.eth.sign(data, zombieAdmin.address);
+	} catch (e) {
+		signature = "";
+	}
+	res.send(signDot(signature));
+});
 
 let signDot = (sign) => {
 	//r,s,v
