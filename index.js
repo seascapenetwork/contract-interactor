@@ -17,6 +17,8 @@ let admin = blockchain.addAccount(process.env.ACCOUNT_1);
 let stakingSaloonDeployer = blockchain.addAccount(process.env.STAKING_SALOON_DEPLOYER);
 let burningAdmin = blockchain.addAccount(process.env.NFTBURNING_DEPLOYER);
 let zombieAdmin = blockchain.addAccount(process.env.ZOMBIE_DEPLOYER);
+let zombieAdminV2 = blockchain.addAccount(process.env.ZOMBIE_DEPLOYER_v2);
+
 let crowns;
 let nftRush;
 let getDate = function () {
@@ -224,7 +226,6 @@ app.get('/sign-nft-scape-points', async function (req, res) {
 	res.send(signature);
 });
 
-
 /**
  * We suppose that all GET parameters are valid and always passed.
  * 
@@ -260,7 +261,6 @@ app.get('/sign-nft-staking-bonus', async function (req, res) {
 
 	res.send(signature);
 });
-
 
 app.get('/sign-scape-forum-quality', async function (req, res) {
 	// ----------------------------------------------------------------
@@ -320,14 +320,18 @@ app.get('/rib/price', async function(req, res) {
 })
 
 app.get('/sign-zombie-farm-nft-token', async function (req, res) {
+	let tokenAddress = req.query.tokenAddress;
+	let nftAddress = req.query.nftAddress;
 	let amount = blockchain.web3.utils.toWei(req.query.amount, "ether");
 	let nftId = parseInt(req.query.nftId);
-	let nonce = parseInt(req.query.nonce.toString());
+	let sessionId = parseInt(req.query.sessionId);
 
 
-	let bytesOnce = blockchain.web3.eth.abi.encodeParameters(["uint256", "uint256", "uint256"], [nftId,amount,nonce]);
+	let bytesOnce = blockchain.web3.eth.abi.encodeParameters(["uint","uint"], [sessionId,nftId]);
 
-	let dataOnce = blockchain.web3.utils.keccak256(bytesOnce);
+	let encodeStr = tokenAddress + bytesOnce.substr(2) + nftAddress.substr(2);
+
+	let dataOnce = blockchain.web3.utils.keccak256(encodeStr);
 
 	let signature;
 	try {
@@ -338,7 +342,7 @@ app.get('/sign-zombie-farm-nft-token', async function (req, res) {
 
 	let dot = signDot(signature);
 
-	let bytesTwice = blockchain.web3.eth.abi.encodeParameters(["uint256","uint8","bytes32","bytes32","uint256"], [amount,dot.v,dot.r,dot.s,nftId]);
+	let bytesTwice = blockchain.web3.eth.abi.encodeParameters(["uint8","bytes32","bytes32","uint","uint"], [dot.v,dot.r,dot.s,nftId,amount]);
 
 	res.send(bytesTwice);
 });
@@ -347,12 +351,13 @@ app.get('/sign-zombie-farm-nft-token', async function (req, res) {
 app.get('/sign-zombie-farm-nft', async function (req, res) {
 	let weight = parseInt(req.query.weight);
 	let nftId = parseInt(req.query.nftId);
+	let nftAddress = req.query.nftAddress;
 	let nonce = parseInt(req.query.nonce.toString());
 
+	let bytes1Once = blockchain.web3.eth.abi.encodeParameters(["uint", "uint"], [nftId,weight]);
+	let bytes2Once = blockchain.web3.eth.abi.encodeParameters(["uint"], [nonce]);
 
-	let bytesOnce = blockchain.web3.eth.abi.encodeParameters(["uint256", "uint256", "uint256"], [nftId,weight,nonce]);
-
-	let dataOnce = blockchain.web3.utils.keccak256(bytesOnce);
+	let dataOnce = blockchain.web3.utils.keccak256(bytes1Once + nftAddress.substr(2) + bytes2Once.substr(2));
 
 	let signature;
 	try {
@@ -363,12 +368,10 @@ app.get('/sign-zombie-farm-nft', async function (req, res) {
 
 	let dot = signDot(signature);
 
-	let bytesTwice = blockchain.web3.eth.abi.encodeParameters(["uint8","bytes32","bytes32","uint256","uint256"], [dot.v,dot.r,dot.s,nftId,weight]);
+	let bytesTwice = blockchain.web3.eth.abi.encodeParameters(["uint8","bytes32","bytes32","uint","uint"], [dot.v,dot.r,dot.s,nftId,weight]);
 
 	res.send(bytesTwice);
 });
-
-
 app.get('/sign-zombie-farm-nfts', async function (req, res) {
 	let nftId1 = parseInt(req.query.nftId1);
 	let nftId2 = parseInt(req.query.nftId2);
@@ -404,7 +407,6 @@ app.get('/sign-zombie-farm-nfts', async function (req, res) {
 
 	res.send(bytesTwice);
 });
-
 
 app.get('/single-zombie', async function (req, res) {
 	let sessionId = parseInt(req.query.sessionId);

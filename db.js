@@ -15,12 +15,12 @@ let connect = async () => {
 		con = null;
 	}
 
-		con = mysql.createConnection({
-			host: process.env.DATABASE_HOST,
-			user: process.env.DATABASE_USERNAME,
-			password: process.env.DATABASE_PASSWORD,
-			database: process.env.DATABASE_NAME
-		});
+	con = mysql.createConnection({
+		host: process.env.DATABASE_HOST,
+		user: process.env.DATABASE_USERNAME,
+		password: process.env.DATABASE_PASSWORD,
+		database: process.env.DATABASE_NAME
+	});
 
 	con.connect(handleError);
 
@@ -36,19 +36,19 @@ let connect = async () => {
 				}
 			});
 		});
-	}, 1000);
+	}, 5000);
 	let res = await con.connect();
 
 	return con;
 };
 
-	function handleError (err) {
-		if (err) {
-			// 如果是连接断开，自动重新连接
-			if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-				connect().then()
-			} else {
-				console.error(err.stack || err);
-			}
+function handleError (err) {
+	if (err) {
+		// 如果是连接断开，自动重新连接
+		if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+			connect().then()
+		} else {
+			console.error(err.stack || err);
 		}
 	}
+}
