@@ -15,9 +15,7 @@ const port = 3000;
 let admin = blockchain.addAccount(process.env.ACCOUNT_1);
 let stakingSaloonDeployer = blockchain.addAccount(process.env.STAKING_SALOON_DEPLOYER);
 let burningAdmin = blockchain.addAccount(process.env.NFTBURNING_DEPLOYER);
-
 let zombieAdmin = blockchain.addAccount(process.env.ZOMBIE_DEPLOYER);
-let zombieAdminV2 = blockchain.addAccount(process.env.ZOMBIE_DEPLOYER_v2);
 
 let crowns;
 let nftRush;
