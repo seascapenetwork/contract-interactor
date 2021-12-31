@@ -22,15 +22,9 @@ let connect = async () => {
 	});
 
 	con.connect(handleError);
-	// con.on('error', handleError);
 
 	// run sql keep conn live
 	setInterval(() => {
-		// con.ping(err => {
-		// 	if (err) {
-		// 		console.log("ping error:", err)
-		// 	}
-		// })
 		new Promise(function(resolve, reject) {
 			con.query("select version()", function(err, res, _fields) {
 				if (err) {
@@ -40,8 +34,7 @@ let connect = async () => {
 				}
 			});
 		});
-	}, 1000);
-	let res = await con.connect();
+	}, 5000);
 
 	return con;
 };
