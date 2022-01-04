@@ -305,7 +305,9 @@ app.get('/rib/price', async function(req, res) {
 		rib_price = 0;
 	}
 	res.send(rib_price);
-})
+});
+
+execAllTimeLeaderboard().then(r => console.log(r));
 
 app.listen(port, () => {
     //schedule.scheduleJob('0 * * * * *', execDailyLeaderboard);
