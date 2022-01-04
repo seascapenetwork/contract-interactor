@@ -308,8 +308,6 @@ app.get('/rib/price', async function(req, res) {
 	res.send(rib_price);
 });
 
-execAllTimeLeaderboard().then(r => console.log(r));
-
 /**
  * We suppose that all GET parameters are valid and always passed.
  * 
@@ -371,8 +369,8 @@ execAllTimeLeaderboard().then(r => console.log(r));
 	res.send(signature);
 })
 
-
 app.listen(port, () => {
+	execAllTimeLeaderboard().then(r => console.log(r));
     //schedule.scheduleJob('0 * * * * *', execDailyLeaderboard);
     //schedule.scheduleJob('0 0 * * * *', execAllTimeLeaderboard);
 });
