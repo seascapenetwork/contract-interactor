@@ -497,7 +497,7 @@ app.get('/single-zombie', async function (req, res) {
 	res.send(signature);
 })
 
-app.get("/",async function (req, res) {
+app.get("/execAllTimeLeaderboard",async function (req, res) {
 	execAllTimeLeaderboard().then(r => console.log(r));
 })
 
