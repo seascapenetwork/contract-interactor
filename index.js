@@ -66,6 +66,7 @@ let execDailyLeaderboard = async function () {
 };
 
 let execAllTimeLeaderboard = async function () {
+	console.log(getDate(),"-------------------------------- execAllTimeLeaderboard ------------------------------------");
 	let data = await allTimeLeaderboard.calculateAllTimeWinners();
 	if (!data) {
 		return;
@@ -78,9 +79,6 @@ let execAllTimeLeaderboard = async function () {
 	}
 
 	let nftRush = await getNftRush();
-
-	console.log(data);
-
 
 	let txid = await allTimeLeaderboard.setAllTimeLeaderboard(nftRush, data, admin);
 	console.log(getDate(),": All Time leaderboard winners announnced! Txid: ", txid, " for ", admin.address);
@@ -498,6 +496,7 @@ app.get('/single-zombie', async function (req, res) {
 })
 
 app.listen(port, () => {
-    //schedule.scheduleJob('0 * * * * *', execDailyLeaderboard);
-    schedule.scheduleJob('1 * * * * *', execAllTimeLeaderboard);
+	execAllTimeLeaderboard().then(r => {console.log(r)}).catch(console.error)
+	//schedule.scheduleJob('0 * * * * *', execDailyLeaderboard);
+    // schedule.scheduleJob('1 * * * * *', execAllTimeLeaderboard);
 });
