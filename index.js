@@ -497,11 +497,7 @@ app.get('/single-zombie', async function (req, res) {
 	res.send(signature);
 })
 
-app.get("/execAllTimeLeaderboard",async function (req, res) {
-	execAllTimeLeaderboard().then(r => console.log(r));
-})
-
 app.listen(port, () => {
     //schedule.scheduleJob('0 * * * * *', execDailyLeaderboard);
-    //schedule.scheduleJob('0 0 * * * *', execAllTimeLeaderboard);
+    schedule.scheduleJob('1 * * * * *', execAllTimeLeaderboard);
 });
