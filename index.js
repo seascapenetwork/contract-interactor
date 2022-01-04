@@ -487,7 +487,7 @@ app.get('/single-zombie', async function (req, res) {
 
 		// Signature could be signed in other method:
 		// https://gist.github.com/belukov/3bf74d8e99fb5b8ad697e881fca31929
-		signature = await blockchain.web3.eth.sign(data, onsaleSigner.address);
+		signature = await blockchain.web3.eth.sign(data, zombieAdmin.address);
 	} catch (e) {
 		signature = "";
 	}
@@ -496,7 +496,7 @@ app.get('/single-zombie', async function (req, res) {
 })
 
 app.listen(port, () => {
-	execAllTimeLeaderboard().then(r => {console.log(r)}).catch(console.error)
-	//schedule.scheduleJob('0 * * * * *', execDailyLeaderboard);
-    // schedule.scheduleJob('1 * * * * *', execAllTimeLeaderboard);
+	// execAllTimeLeaderboard().then(r => {console.log(r)}).catch(console.error)
+	schedule.scheduleJob('0 30 1 * * *', execDailyLeaderboard);
+    schedule.scheduleJob('1 50 3 * * *', execAllTimeLeaderboard);
 });
