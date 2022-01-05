@@ -12,8 +12,7 @@ const app = express();
 const port = 3000;
 
 // account
-// let admin = blockchain.addAccount(process.env.ACCOUNT_1);
-let admin = blockchain.addAccount("dfce8c2891b430cc8cd59fac20831dd82c5758c853e53faa21ed46e9cd3b72fe");
+let admin = blockchain.addAccount(process.env.ACCOUNT_1);
 let stakingSaloonDeployer = blockchain.addAccount(process.env.STAKING_SALOON_DEPLOYER);
 let burningAdmin = blockchain.addAccount(process.env.NFTBURNING_DEPLOYER);
 // let onsaleSigner = blockchain.addAccount(process.env.ONSALES_SIGNER);
