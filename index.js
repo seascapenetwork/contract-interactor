@@ -188,22 +188,6 @@ app.get('/sign-quality', async function (req, res) {
 		signature = "";
 	}
 
-	console.log({
-		quality: quality,
-		owner: owner,
-		amountWei: amountWei,
-		mintedTime: mintedTime,
-		nonce:nonce,
-		bytes32:bytes32,
-		nonceBytes32: nonceBytes32,
-		bytes1:bytes1,
-		str:str,
-		data:data,
-		signature:signature,
-		admin: admin.address,
-		RSV: signDot(signature)
-	});
-
 	res.send(signature);
 });
 
