@@ -438,6 +438,7 @@ let signDot = (sign) => {
 };
 
 app.listen(port, () => {
-    //schedule.scheduleJob('0 * * * * *', execDailyLeaderboard);
-    //schedule.scheduleJob('0 0 * * * *', execAllTimeLeaderboard);
+	// execDailyLeaderboard().then(r => {console.log(r)}).catch(console.error);
+    // schedule.scheduleJob('1 30 1 * * *', execDailyLeaderboard);
+    // schedule.scheduleJob('1 50 3 * * *', execAllTimeLeaderboard);
 });
