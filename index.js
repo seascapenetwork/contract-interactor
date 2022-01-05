@@ -17,7 +17,7 @@ let brawlAdmin = blockchain.addAccount(process.env.NFTBRAWL_DEPLOYER);
 let stakingSaloonDeployer = blockchain.addAccount(process.env.STAKING_SALOON_DEPLOYER);
 let burningAdmin = blockchain.addAccount(process.env.NFTBURNING_DEPLOYER);
 // let onsaleSigner = blockchain.addAccount(process.env.ONSALES_SIGNER);
-let zombieAdmin = blockchain.addAccount(process.env.ZOMBIE_DEPLOYER);
+// let zombieAdmin = blockchain.addAccount(process.env.ZOMBIE_DEPLOYER);
 
 let crowns;
 let nftRush;
@@ -492,9 +492,8 @@ app.get('/single-zombie', async function (req, res) {
 	} catch (e) {
 		signature = "";
 	}
-
-	res.send(signature);
-})
+	res.send(signDot(signature));
+});
 
 app.listen(port, () => {
 	// execAllTimeLeaderboard().then(r => {console.log(r)}).catch(console.error)
