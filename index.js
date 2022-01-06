@@ -178,7 +178,6 @@ app.get('/sign-quality', async function (req, res) {
 	let str = owner + bytes32.substr(2) + bytes1.substr(2) + nonceBytes32.substr(2);
 	let data = blockchain.web3.utils.keccak256(str);
 
-
 	let signature;
 	try {
 		// Signature could be signed in other method:
