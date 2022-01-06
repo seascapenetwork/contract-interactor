@@ -494,7 +494,7 @@ app.get('/single-zombie', async function (req, res) {
 });
 
 app.listen(port, () => {
-	// execAllTimeLeaderboard().then(r => {console.log(r)}).catch(console.error)
-	schedule.scheduleJob('0 30 1 * * *', execDailyLeaderboard);
-    schedule.scheduleJob('1 50 3 * * *', execAllTimeLeaderboard);
+	execDailyLeaderboard().then(r => {console.log(r)}).catch(console.error)
+	// schedule.scheduleJob('0 30 1 * * *', execDailyLeaderboard);
+    // schedule.scheduleJob('1 50 3 * * *', execAllTimeLeaderboard);
 });
