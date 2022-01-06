@@ -48,11 +48,13 @@ let getNftRush = async function () {
 let execDailyLeaderboard = async function () {
 	console.log(getDate(),"====================================== execDailyLeaderboard start ===========================================");
 	let data = await dailyLeaderboard.calculateDailyWinners();
+	console.log("calculateDailyWinners:",data);
 	if (!data) {
 		return;
 	}
 
 	let approvement = await approveCrowns(data, 'daily');
+	console.log("approveCrowns:",approvement);
 	if (approvement === false) {
 		console.log(getDate(),": Failed to approve required amount of CWS. Not enough balance");
 		return;
