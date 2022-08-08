@@ -5,7 +5,7 @@ let getCon = async function() {
 	if (!con) {
 		con = await db.getConnection();
 	}
-	
+
 	return con;
 }
 
@@ -32,7 +32,7 @@ Date.prototype.toMysqlFormat = function() {
 module.exports.setAllTimeLeaderboard = async function(nftRush, data, nftRushOwner) {
 	//sessionId, spentWallets, spentAmount, mintedWallets, mintedAmount)
 	const gasPrice = await blockchain.web3.eth.getGasPrice();
-	var gasEstimate = await nftRush.methods.announceAllTimeMintedWinners(data.session_id, data.minted_wallets, data.minted_amount).estimateGas({ from: nftRushOwner.address }); 
+	var gasEstimate = await nftRush.methods.announceAllTimeMintedWinners(data.session_id, data.minted_wallets, data.minted_amount).estimateGas({ from: nftRushOwner.address });
 
 	let params = {
 		from: nftRushOwner.address,
@@ -40,7 +40,7 @@ module.exports.setAllTimeLeaderboard = async function(nftRush, data, nftRushOwne
 		gas: gasEstimate * 3
 	};
 	var result = await nftRush.methods.announceAllTimeMintedWinners(data.session_id, data.minted_wallets, data.minted_amount).send(params);
-	
+
 	await setAllTimeAnnounced(data.session_id);
 
 	return 	result.transactionHash;
@@ -77,23 +77,22 @@ let setAllTimeAnnounced = async function(sessionId) {
 };
 
 module.exports.calculateAllTimeWinners = async function() {
-    session = await getLastSession();
-    
+    let session = await getLastSession();
 	// after session expiration, we can define announcement only for one time.
     if (!isActiveSession(session) && !session.all_time_announced) {
       	let minted = await getMintedWinners(session)
-		  
+
       	return {
-			"session_id": session.id,	    
-			"spent_amount": 0,	    
-			"spent_wallets": [],	    
-			"minted_amount": minted.amount,	    
-			"minted_wallets": minted.wallets	    
-		};      
+			"session_id": session.id,
+			"spent_amount": 0,
+			"spent_wallets": [],
+			"minted_amount": minted.amount,
+			"minted_wallets": minted.wallets
+		};
 	}
 };
 
-let getMintedWinners = async function(session) {    
+let getMintedWinners = async function(session) {
 	let leaderboard = await getMintedAllTime(session.id)
 
 	let wallets = [];
@@ -101,7 +100,7 @@ let getMintedWinners = async function(session) {
 		wallets.push(element.wallet_address);
 	});
 	let amount = leaderboard.length;
-	
+
 	let placeholder = process.env.ADDRESS_1;
 
 	for (var i=amount; i<10; i++) {
@@ -122,7 +121,7 @@ let isActiveSession = function(session) {
 };
 
 let getMintedAllTime = async function(sessionId) {
-	let sql = `SELECT wallet_address, COUNT(nft_id) as amounts FROM minted_leaderboards WHERE session_id = '${sessionId}' GROUP BY wallet_address ORDER BY COUNT(nft_id) DESC LIMIT 10 `;
+	let sql = `SELECT wallet_address, COUNT(nft_id) as amounts,updated_at FROM minted_leaderboards WHERE session_id = '${sessionId}' GROUP BY wallet_address ORDER BY COUNT(nft_id) DESC, MAX(updated_at) LIMIT 10 `;
 
 	let con = await getCon();
 	return await new Promise(function(resolve, reject) {
