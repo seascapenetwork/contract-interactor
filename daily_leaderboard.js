@@ -5,7 +5,7 @@ let getCon = async function() {
 	if (!con) {
 		con = await db.getConnection();
 	}
-	
+
 	return con;
 }
 
@@ -32,7 +32,7 @@ Date.prototype.toMysqlFormat = function() {
 module.exports.setDailyLeaderboard = async function(nftRush, data, nftRushOwner) {
 	//sessionId, spentWallets, spentAmount, mintedWallets, mintedAmount)
 	const gasPrice = await blockchain.web3.eth.getGasPrice();
-	var gasEstimate = await nftRush.methods.announceDailySpentWinners(data.session_id, data.spent_wallets, data.spent_amount).estimateGas({ from: nftRushOwner.address }); 
+	var gasEstimate = await nftRush.methods.announceDailySpentWinners(data.session_id, data.spent_wallets, data.spent_amount).estimateGas({ from: nftRushOwner.address });
 
 	let params = {
 		from: nftRushOwner.address,
@@ -40,14 +40,14 @@ module.exports.setDailyLeaderboard = async function(nftRush, data, nftRushOwner)
 		gas: gasEstimate * 3
 	};
 	var result = await nftRush.methods.announceDailySpentWinners(data.session_id, data.spent_wallets, data.spent_amount).send(params);
-	
+
 	return 	result.transactionHash;
 };
 
 module.exports.claimSpents = async function(nftRush, account) {
 	//sessionId, spentWallets, spentAmount, mintedWallets, mintedAmount)
 	const gasPrice = await blockchain.web3.eth.getGasPrice();
-	var gasEstimate = await nftRush.methods.claimDailySpent().estimateGas({ from: account.address }); 
+	var gasEstimate = await nftRush.methods.claimDailySpent().estimateGas({ from: account.address });
 
 	let params = {
 		from: account.address,
@@ -91,22 +91,22 @@ let setDaysAnnounced = async function(sessionId) {
 
 module.exports.calculateDailyWinners = async function() {
     session = await getLastSession();
-    
+
 	// after session expiration, we can define announcement only for one time.
     if (!session.all_days_announced) {
-      	let spent = await getSpentWinners(session)      
-		  
-      	if (!isActiveSession(session)) { 
+      	let spent = await getSpentWinners(session)
+
+      	if (!isActiveSession(session)) {
 		  	await setDaysAnnounced(session.id);
 		}
 
       	return {
-			"session_id": session.id,	    
-			"spent_amount": spent.amount,	    
-			"spent_wallets": spent.wallets,	    
-			"minted_amount": 0,	    
-			"minted_wallets": []	    
-		};      
+			"session_id": session.id,
+			"spent_amount": spent.amount,
+			"spent_wallets": spent.wallets,
+			"minted_amount": 0,
+			"minted_wallets": []
+		};
 	}
 };
 
@@ -116,7 +116,7 @@ let getYesterday = function(date) {
 	let hour = 0;
 	let ms = 0;
 
-	let beginDate = new Date(); 
+	let beginDate = new Date();
 	beginDate.setHours(hour, min, sec, ms);
 	beginDate.setDate(beginDate.getDate() - 1);
 	return beginDate;
@@ -134,7 +134,7 @@ let getSpentWinners = async function(session) {
 		wallets.push(element.wallet_address);
 	});
 	let amount = leaderboard.length;
-	
+
 	let placeholder = process.env.ADDRESS_1;
 
 	for (var i=amount; i<10; i++) {
@@ -155,8 +155,8 @@ let isActiveSession = async function(session) {
 };
 
 let getSpentDay = async function(sessionId, beginDate, endDate) {
-	let sql = `SELECT wallet_address, SUM(amount) as amounts FROM spent_leaderboards WHERE date_time >= '${beginDate.toMysqlFormat()}' AND date_time <= '${endDate.toMysqlFormat()}' AND\
-	session_id = '${sessionId}' GROUP BY wallet_address ORDER BY SUM(amount) DESC LIMIT 10 `;
+	let sql = `SELECT wallet_address, SUM(amount) as amounts,updated_at FROM spent_leaderboards WHERE date_time >= '${beginDate.toMysqlFormat()}' AND date_time <= '${endDate.toMysqlFormat()}' AND\
+	session_id = '${sessionId}' GROUP BY wallet_address ORDER BY SUM(amount) DESC,max(updated_at) ASC LIMIT 10 `;
 
 	let con = await getCon();
 
