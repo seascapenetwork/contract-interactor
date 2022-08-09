@@ -39,6 +39,8 @@ module.exports.setDailyLeaderboard = async function(nftRush, data, nftRushOwner)
 		gasPrice: gasPrice,
 		gas: gasEstimate * 3
 	};
+	console.log('-------------------------------------------------- announceDailySpentWinners ---------------------------------------------------------------');
+	console.log(data.session_id, data.spent_wallets, data.spent_amount);
 	var result = await nftRush.methods.announceDailySpentWinners(data.session_id, data.spent_wallets, data.spent_amount).send(params);
 
 	return 	result.transactionHash;
@@ -158,6 +160,7 @@ let getSpentDay = async function(sessionId, beginDate, endDate) {
 	let sql = `SELECT wallet_address, SUM(amount) as amounts,updated_at FROM spent_leaderboards WHERE date_time >= '${beginDate.toMysqlFormat()}' AND date_time <= '${endDate.toMysqlFormat()}' AND\
 	session_id = '${sessionId}' GROUP BY wallet_address ORDER BY SUM(amount) DESC,max(updated_at) ASC LIMIT 10 `;
 
+	console.log('getSpentDay:',sql);
 	let con = await getCon();
 
 	return await new Promise(function(resolve, reject) {
