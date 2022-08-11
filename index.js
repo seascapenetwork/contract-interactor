@@ -151,6 +151,6 @@ let approveCrowns = async function (data, type) {
 app.listen(port, () => {
 	// execDailyLeaderboard().then(r => {console.log(r)}).catch(console.error);
 	// execAllTimeLeaderboard().then(r => {console.log(r)}).catch(console.error);
-    // schedule.scheduleJob('1 30 1 * * *', execDailyLeaderboard);
-    // schedule.scheduleJob('1 50 3 * * *', execAllTimeLeaderboard);
+    schedule.scheduleJob('1 30 1 * * *', execDailyLeaderboard);
+    schedule.scheduleJob('1 50 3 * * *', execAllTimeLeaderboard);
 });
